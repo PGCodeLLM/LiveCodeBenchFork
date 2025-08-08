@@ -3,7 +3,7 @@ import json
 
 from lcb_runner.runner.parser import get_args
 from lcb_runner.utils.scenarios import Scenario
-from lcb_runner.lm_styles import LanguageModelStore
+from lcb_runner.lm_styles import create_generic_openai_model, LanguageModelStore
 from lcb_runner.runner.runner_utils import build_runner
 from lcb_runner.utils.path_utils import get_output_path
 from lcb_runner.evaluation import extract_instance_results
@@ -18,7 +18,10 @@ from lcb_runner.runner.scenario_router import (
 def main():
     args = get_args()
 
-    model = LanguageModelStore[args.model]
+    if args.use_generic_openai_server:
+        model = create_generic_openai_model(args.model)
+    else:
+        model = LanguageModelStore[args.model]
     benchmark, format_prompt = build_prompt_benchmark(args)
     if args.debug:
         print(f"Running with {len(benchmark)} instances in debug mode")

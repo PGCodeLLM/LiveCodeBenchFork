@@ -867,5 +867,15 @@ LanguageModelStore: dict[str, LanguageModel] = {
     lm.model_name: lm for lm in LanguageModelList
 }
 
+def create_generic_openai_model(model_name: str) -> LanguageModel:
+    """Create a generic OpenAI model representation."""
+    return LanguageModel(
+        model_name=model_name,
+        model_repr=model_name,
+        model_style=LMStyle.OpenAIChat,
+        release_date=datetime.now(),
+        link="https://openai.com"
+    )
+
 if __name__ == "__main__":
     print(list(LanguageModelStore.keys()))

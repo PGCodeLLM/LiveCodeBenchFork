@@ -60,7 +60,7 @@ def get_args():
     )
     parser.add_argument("--top_p", type=float, default=0.95, help="Top p for sampling")
     parser.add_argument(
-        "--max_tokens", type=int, default=2000, help="Max tokens for sampling"
+        "--max_tokens", type=int, default=None, help="Max tokens for sampling"
     )
     parser.add_argument(
         "--multiprocess",
@@ -130,6 +130,11 @@ def get_args():
         type=str,
         default=None,
         help="End date for the contest to filter the evaluation file (format - YYYY-MM-DD)",
+    )
+    parser.add_argument(
+        "--use_generic_openai_server",
+        action="store_true",
+        help="Use generic OpenAI server (set both OPENAI_API_KEY and OPENAI_BASE_URL environment variables)",
     )
 
     args = parser.parse_args()

@@ -1,3 +1,4 @@
+import os
 import json
 import zlib
 import pickle
@@ -6,7 +7,7 @@ from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass
 
-from datasets import load_dataset
+from datasets import load_dataset, Features, Value
 
 
 class Platform(Enum):
@@ -122,7 +123,36 @@ class CodeGenerationProblem:
 
 
 def load_code_generation_dataset(release_version="release_v1", start_date=None, end_date=None) -> list[CodeGenerationProblem]:
-    dataset = load_dataset("livecodebench/code_generation_lite", split="test", version_tag=release_version, trust_remote_code=True)
+
+    # Data folder path
+    DATA_FOLDER = os.path.abspath(os.path.join(__file__, "..", "..", "..", "data"))
+    
+    data_files = {
+        "release_v1": os.path.join(DATA_FOLDER, "test.jsonl"),
+        "release_v2": os.path.join(DATA_FOLDER, "test2.jsonl"),
+        "release_v3": os.path.join(DATA_FOLDER, "test3.jsonl"),
+        "release_v4": os.path.join(DATA_FOLDER, "test4.jsonl"),
+        "release_v5": os.path.join(DATA_FOLDER, "test5.jsonl"),
+        "release_v6": os.path.join(DATA_FOLDER, "test6.jsonl"),
+        "release_latest": os.path.join(DATA_FOLDER, "test6.jsonl"),
+    }
+
+    # As defined in https://huggingface.co/datasets/livecodebench/code_generation_lite/blob/main/code_generation_lite.py
+    features=Features({
+        "question_title": Value("string"),
+        "question_content": Value("string"),
+        "platform": Value("string"),
+        "question_id": Value("string"),
+        "contest_id": Value("string"),
+        "contest_date": Value("string"),
+        "starter_code": Value("string"),
+        "difficulty": Value("string"),
+        "public_test_cases": Value("string"),
+        "private_test_cases": Value("string"),
+        "metadata": Value("string"),
+    })
+    
+    dataset = load_dataset("json", data_files=data_files[release_version], split="train", features=features)
     dataset = [CodeGenerationProblem(**p) for p in dataset]  # type: ignore
     if start_date is not None:
         p_start_date = datetime.strptime(start_date, "%Y-%m-%d")
