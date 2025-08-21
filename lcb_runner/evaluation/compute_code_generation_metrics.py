@@ -59,6 +59,12 @@ def evaluate_generations_by_problem(args):
     debug: bool = args[2]
     timeout: int = args[3]
 
+    # NOTE: The debug flag is intentionally overridden to True here.
+    # We override the passed 'debug' argument to get detailed logging.
+    # LCB accepts a --debug flag, but it does not work for this function because its value is not passed down.
+    # This override also conveniently avoids the flag's unwanted side effects (like disabling parallelism).
+    debug = True
+
     res = []
     metadata = []
     for o_idx, o in enumerate(problem_generations):
