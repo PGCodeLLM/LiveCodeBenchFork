@@ -59,6 +59,9 @@ def get_args():
         "--temperature", type=float, default=0.2, help="Temperature for sampling"
     )
     parser.add_argument("--top_p", type=float, default=0.95, help="Top p for sampling")
+    parser.add_argument("--top_k", type=int, default=0, help="Top k for sampling") # Default value set to be the same as VLLM 0.10.0 default (https://docs.vllm.ai/en/latest/api/vllm/index.html?h=samplingp#vllm.SamplingParams)
+    parser.add_argument("--repetition_penalty", type=float, default=1.0, help="Repetition penalty") # Default value set to be the same as VLLM 0.10.0 default (https://docs.vllm.ai/en/latest/api/vllm/index.html?h=samplingp#vllm.SamplingParams)
+    parser.add_argument("--presence_penalty", type=float, default=0.0, help="Presence penalty") # Default value set to be the same as VLLM 0.10.0 default (https://docs.vllm.ai/en/latest/api/vllm/index.html?h=samplingp#vllm.SamplingParams)
     parser.add_argument(
         "--max_tokens", type=int, default=None, help="Max tokens for sampling"
     )
