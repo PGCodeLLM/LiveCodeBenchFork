@@ -33,11 +33,11 @@ class OpenAIRunner(BaseRunner):
         else:
             self.client_kwargs: dict[str | str] = {
                 "model": args.model,
-                "temperature": args.temperature,
                 "max_tokens": args.max_tokens,
+                "temperature": args.temperature,
                 "top_p": args.top_p,
-                "frequency_penalty": 0,
-                "presence_penalty": 0,
+                "presence_penalty": args.presence_penalty,
+                "extra_body": {"top_k": args.top_k, "repetition_penalty": args.repetition_penalty},
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
