@@ -56,12 +56,12 @@ def get_args():
         help="Number of samples for which code generation was run (used to map the code generation file during self-repair)",
     )
     parser.add_argument(
-        "--temperature", type=float, default=0.1, help="Temperature for sampling"
+        "--temperature", type=float, default=0.2, help="Temperature for sampling"
     )
-    parser.add_argument("--top_p", type=float, default=0.1, help="Top p for sampling")
-    parser.add_argument("--top_k", type=int, default=-1, help="Top k for sampling")
-    parser.add_argument("--repetition_penalty", type=float, default=1.1, help="Repetition penalty")
-    parser.add_argument("--presence_penalty", type=float, default=0.1, help="Presence penalty")
+    parser.add_argument("--top_p", type=float, default=0.95, help="Top p for sampling")
+    parser.add_argument("--top_k", type=int, default=0, help="Top k for sampling")
+    parser.add_argument("--repetition_penalty", type=float, default=1.0, help="Repetition penalty")
+    parser.add_argument("--presence_penalty", type=float, default=0.0, help="Presence penalty")
     parser.add_argument(
         "--max_tokens", type=int, default=None, help="Max tokens for sampling"
     )

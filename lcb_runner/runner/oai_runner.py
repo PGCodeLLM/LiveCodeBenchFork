@@ -33,8 +33,8 @@ class OpenAIRunner(BaseRunner):
         else:
             self.client_kwargs: dict[str | str] = {
                 "model": args.model,
-                "max_tokens": args.max_tokens,
                 "temperature": args.temperature,
+                "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "presence_penalty": args.presence_penalty,
                 "extra_body": {"top_k": args.top_k, "repetition_penalty": args.repetition_penalty},
