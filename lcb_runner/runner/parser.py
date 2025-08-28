@@ -140,6 +140,13 @@ def get_args():
         help="Use generic OpenAI server (set both OPENAI_API_KEY and OPENAI_BASE_URL environment variables)",
     )
 
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        required=True,
+        help="The directory storing the outputs",
+    )
+
     args = parser.parse_args()
 
     args.stop = args.stop.split(",")
