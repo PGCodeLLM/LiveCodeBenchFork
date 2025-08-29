@@ -9,8 +9,9 @@ from typing import Callable, Optional, Dict, Any, List, Iterator
 from concurrent.futures import TimeoutError
 
 import attrs
-import tqdm
 from pebble import concurrent, ProcessPool, ProcessExpired
+
+from lcb_runner.utils.progress import TeeTqdm as tqdm
 
 
 class FuncTimeoutError(TimeoutError):
@@ -105,6 +106,7 @@ def run_tasks_in_parallel_iter(
     max_tasks_per_worker: Optional[int] = None,
     use_spawn: bool = True,
     max_mem: int = 1024 * 1024 * 1024 * 4,
+    progress_file=None
 ) -> Iterator[TaskResult]:
     """
     Args:
@@ -133,11 +135,12 @@ def run_tasks_in_parallel_iter(
 
         iterator = future.result()
         if use_progress_bar:
-            pbar = tqdm.tqdm(
+            pbar = tqdm(
                 desc=progress_bar_desc,
                 total=len(tasks),
                 dynamic_ncols=True,
                 file=sys.stdout,
+                progress_file=progress_file
             )
         else:
             pbar = None
@@ -199,6 +202,7 @@ def run_tasks_in_parallel(
     progress_bar_desc: Optional[str] = None,
     max_tasks_per_worker: Optional[int] = None,
     use_spawn: bool = True,
+    progress_file: str =None
 ) -> List[TaskResult]:
     """
     Args:
@@ -226,6 +230,7 @@ def run_tasks_in_parallel(
             progress_bar_desc=progress_bar_desc,
             max_tasks_per_worker=max_tasks_per_worker,
             use_spawn=use_spawn,
+            progress_file=progress_file
         )
     )
 
