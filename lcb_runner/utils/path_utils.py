@@ -38,3 +38,8 @@ def get_eval_all_output_path(model_repr:str, args) -> str:
     cot_suffix = "_cot" if args.cot_code_execution else ""
     path = f"output/{args.output_dir}/{scenario}_{n}_{temperature}{cot_suffix}_eval_all.json"
     return path
+
+def get_progress_path(args) -> str:
+    path = f"output/{args.output_dir}/progress.json"
+    ensure_dir(path)
+    return path

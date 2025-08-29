@@ -2,10 +2,9 @@ import os
 import json
 from abc import ABC, abstractmethod
 
-from tqdm import tqdm
-
 from lcb_runner.lm_styles import LanguageModel
-from lcb_runner.utils.path_utils import get_cache_path
+from lcb_runner.utils.path_utils import get_cache_path, get_progress_path
+from lcb_runner.utils.progress import TeeTqdm as tqdm
 from lcb_runner.utils.multiprocess import run_tasks_in_parallel
 from lcb_runner.runner.scenario_router import Scenario
 
@@ -53,7 +52,7 @@ class BaseRunner(ABC):
         elif isinstance(prompt, tuple):
             prompt_cache = prompt[0] + json.dumps(prompt[1])
         else:
-            prompt_cache = prompt      
+            prompt_cache = prompt
 
         if cache is not None and prompt_cache in cache:
             if len(cache[prompt_cache]) == args.n:
@@ -77,12 +76,14 @@ class BaseRunner(ABC):
             )
             for prompt in prompts
         ]
+        progress_file_path = get_progress_path(self.args)
         if self.args.multiprocess > 1:
             parallel_outputs = run_tasks_in_parallel(
                 self.run_single,
                 arguments,
                 self.args.multiprocess,
                 use_progress_bar=True,
+                progress_file=progress_file_path
             )
             for output in parallel_outputs:
                 if output.is_success():
@@ -93,7 +94,8 @@ class BaseRunner(ABC):
                     print(output.exception_tb)
                     outputs.extend([""] * self.args.n)
         else:
-            outputs = [self.run_single(argument) for argument in tqdm(arguments)]
+            outputs = [self.run_single(argument) for argument in
+                       tqdm(arguments, progress_file=progress_file_path)]
 
         if self.args.use_cache:
             for prompt, output in zip(prompts, outputs):
@@ -141,7 +143,7 @@ class BaseRunner(ABC):
         for problem_idx, problem in enumerate(benchmark):
             for check_metadata_idx, check_metadata in enumerate(check_metadata_list):
                 if problem.question_id == check_metadata['question_id']:
-                    count += 1 
+                    count += 1
                     question_content = check_metadata["question_content"]
                     code_list = check_metadata["code_list"]
                     output_list = check_metadata["output_list"]
