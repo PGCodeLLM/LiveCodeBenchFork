@@ -1,4 +1,5 @@
 import os
+import json
 from time import sleep
 
 try:
@@ -16,6 +17,12 @@ class OpenAIRunner(BaseRunner):
 
     def __init__(self, args, model):
         super().__init__(args, model)
+
+        # Parse user-provided extra_body and extra_headers
+        extra_body = json.loads(args.extra_body) if args.extra_body else {}
+        extra_headers = json.loads(args.extra_headers) if args.extra_headers else {}
+
+
         if model.model_style == LMStyle.OpenAIReasonPreview:
             self.client_kwargs: dict[str | str] = {
                 "model": args.model,
@@ -31,17 +38,27 @@ class OpenAIRunner(BaseRunner):
                 "reasoning_effort": reasoning_effort,
             }
         else:
+            if args.top_k:
+                extra_body["top_k"] = args.top_k
+            if args.repetition_penalty:
+                extra_body["repetition_penalty"] = args.repetition_penalty
+
             self.client_kwargs: dict[str | str] = {
                 "model": args.model,
                 "temperature": args.temperature,
                 "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "presence_penalty": args.presence_penalty,
-                "extra_body": {"top_k": args.top_k, "repetition_penalty": args.repetition_penalty},
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
             }
+
+            # Only add extra_body/extra_headers if they have content
+            if extra_body:
+                self.client_kwargs["extra_body"] = extra_body
+            if extra_headers:
+                self.client_kwargs["extra_headers"] = extra_headers
 
     def _run_single(self, prompt: list[dict[str, str]], n: int = 10) -> list[str]:
         assert isinstance(prompt, list)
