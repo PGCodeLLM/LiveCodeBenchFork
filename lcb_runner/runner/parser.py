@@ -139,6 +139,18 @@ def get_args():
         action="store_true",
         help="Use generic OpenAI server (set both OPENAI_API_KEY and OPENAI_BASE_URL environment variables)",
     )
+    parser.add_argument(
+        "--extra_body",
+        type=str,
+        default=None,
+        help="Extra body parameters as JSON string",
+    )
+    parser.add_argument(
+        "--extra_headers",
+        type=str,
+        default=None,
+        help="Extra headers as JSON string",
+    )
 
     parser.add_argument(
         "--output_dir",
