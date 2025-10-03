@@ -152,6 +152,11 @@ def get_args():
         default=None,
         help="Extra headers as JSON string",
     )
+    parser.add_argument(
+        "--stream",
+        action="store_true",
+        help="Enable streaming API for inference",
+    )
 
     parser.add_argument(
         "--output_dir",
