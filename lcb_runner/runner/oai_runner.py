@@ -38,9 +38,9 @@ class OpenAIRunner(BaseRunner):
                 "reasoning_effort": reasoning_effort,
             }
         else:
-            if args.top_k:
+            if args.top_k is not None:
                 extra_body["top_k"] = args.top_k
-            if args.repetition_penalty:
+            if args.repetition_penalty is not None:
                 extra_body["repetition_penalty"] = args.repetition_penalty
 
             self.client_kwargs: dict[str | str] = {
@@ -48,11 +48,13 @@ class OpenAIRunner(BaseRunner):
                 "temperature": args.temperature,
                 "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
-                "presence_penalty": args.presence_penalty,
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
             }
+
+            if args.presence_penalty is not None:
+                self.client_kwargs["presence_penalty"] = args.presence_penalty
 
             # Only add extra_body/extra_headers if they have content
             if extra_body:
