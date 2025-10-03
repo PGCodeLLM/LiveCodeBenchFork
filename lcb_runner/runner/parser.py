@@ -142,13 +142,13 @@ def get_args():
     parser.add_argument(
         "--extra_body",
         type=str,
-        default="",
+        default=None,
         help="Extra body parameters as JSON string",
     )
     parser.add_argument(
         "--extra_headers",
         type=str,
-        default="",
+        default=None,
         help="Extra headers as JSON string",
     )
 
