@@ -22,6 +22,8 @@ class OpenAIRunner(BaseRunner):
         extra_body = json.loads(args.extra_body) if args.extra_body else {}
         extra_headers = json.loads(args.extra_headers) if args.extra_headers else {}
 
+        # Store stream setting
+        self.stream = getattr(args, 'stream', False)
 
         if model.model_style == LMStyle.OpenAIReasonPreview:
             self.client_kwargs: dict[str | str] = {
@@ -72,10 +74,42 @@ class OpenAIRunner(BaseRunner):
             return []
 
         try:
-            response = OpenAIRunner.client.chat.completions.create(
-                messages=prompt,
-                **self.client_kwargs,
-            )
+            if not self.stream:
+                response = OpenAIRunner.client.chat.completions.create(
+                    messages=prompt,
+                    **self.client_kwargs,
+                )
+            else:
+                # Handle streaming
+                stream_response = OpenAIRunner.client.chat.completions.create(
+                    messages=prompt,
+                    stream=True,
+                    **self.client_kwargs,
+                )
+
+                num_samples = self.client_kwargs.get("n", 1)
+                accumulated_content = [""] * num_samples
+
+                for chunk in stream_response:
+                    if chunk.choices:
+                        for choice in chunk.choices:
+                            idx = choice.index
+                            if choice.delta.content:
+                                accumulated_content[idx] += choice.delta.content
+
+                # Build compatible response object
+                class StreamedChoice:
+                    def __init__(self, content, index):
+                        self.message = type('obj', (object,), {'content': content})()
+                        self.index = index
+
+                class StreamedResponse:
+                    def __init__(self, choices):
+                        self.choices = choices
+
+                choices = [StreamedChoice(content, i) for i, content in enumerate(accumulated_content)]
+                response = StreamedResponse(choices)
+
         except (
             openai.APIError,
             openai.RateLimitError,
