@@ -60,6 +60,8 @@ class OpenAIRunner(BaseRunner):
             if extra_headers:
                 self.client_kwargs["extra_headers"] = extra_headers
 
+        print(f"[LCB Inference Parameters] {self.client_kwargs}")
+
     def _run_single(self, prompt: list[dict[str, str]], n: int = 10) -> list[str]:
         assert isinstance(prompt, list)
 
