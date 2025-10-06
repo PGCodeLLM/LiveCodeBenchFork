@@ -1,12 +1,12 @@
 import os
 import json
+import time
 from time import sleep
 
-try:
-    import openai
-    from openai import OpenAI
-except ImportError as e:
-    pass
+import openai
+from openai import OpenAI
+from openai.types.chat import ChatCompletion, ChatCompletionMessage
+from openai.types.chat.chat_completion import Choice
 
 from lcb_runner.lm_styles import LMStyle
 from lcb_runner.runner.base_runner import BaseRunner
@@ -26,7 +26,7 @@ class OpenAIRunner(BaseRunner):
         self.stream = getattr(args, 'stream', False)
 
         if model.model_style == LMStyle.OpenAIReasonPreview:
-            self.client_kwargs: dict[str | str] = {
+            self.client_kwargs = {
                 "model": args.model,
                 "max_completion_tokens": 25000,
             }
@@ -35,7 +35,7 @@ class OpenAIRunner(BaseRunner):
                 "__" in args.model
             ), f"Model {args.model} is not a valid OpenAI Reasoning model as we require reasoning effort in model name."
             model, reasoning_effort = args.model.split("__")
-            self.client_kwargs: dict[str | str] = {
+            self.client_kwargs = {
                 "model": model,
                 "reasoning_effort": reasoning_effort,
             }
@@ -45,7 +45,7 @@ class OpenAIRunner(BaseRunner):
             if args.repetition_penalty is not None:
                 extra_body["repetition_penalty"] = args.repetition_penalty
 
-            self.client_kwargs: dict[str | str] = {
+            self.client_kwargs = {
                 "model": args.model,
                 "temperature": args.temperature,
                 "max_tokens": args.max_tokens,
@@ -89,26 +89,44 @@ class OpenAIRunner(BaseRunner):
 
                 num_samples = self.client_kwargs.get("n", 1)
                 accumulated_content = [""] * num_samples
+                finish_reasons = [None] * num_samples
+                roles = [None] * num_samples
 
                 for chunk in stream_response:
-                    if chunk.choices:
-                        for choice in chunk.choices:
-                            idx = choice.index
+                    if not chunk.choices:
+                        continue
+                    for choice in chunk.choices:
+                        idx = choice.index
+                        if choice.delta:
                             if choice.delta.content:
                                 accumulated_content[idx] += choice.delta.content
+                            if choice.delta.role:
+                                roles[idx] = choice.delta.role
+                        if choice.finish_reason:
+                            finish_reasons[idx] = choice.finish_reason
 
-                # Build compatible response object
-                class StreamedChoice:
-                    def __init__(self, content, index):
-                        self.message = type('obj', (object,), {'content': content})()
-                        self.index = index
+                choices = []
+                for i in range(num_samples):
+                    role = roles[i] if roles[i] else "assistant"
+                    finish_reason = finish_reasons[i] if finish_reasons[i] else "stop"
+                    choices.append(
+                        Choice(
+                            index=i,
+                            finish_reason=finish_reason,
+                            message=ChatCompletionMessage(
+                                role=role,
+                                content=accumulated_content[i],
+                            ),
+                        )
+                    )
 
-                class StreamedResponse:
-                    def __init__(self, choices):
-                        self.choices = choices
-
-                choices = [StreamedChoice(content, i) for i, content in enumerate(accumulated_content)]
-                response = StreamedResponse(choices)
+                response = ChatCompletion(
+                    id="streamed-" + str(int(time.time())),
+                    object="chat.completion",
+                    created=int(time.time()),
+                    model=self.client_kwargs.get("model", "unknown"),
+                    choices=choices,
+                )
 
         except (
             openai.APIError,
@@ -129,4 +147,4 @@ class OpenAIRunner(BaseRunner):
             print(f"Failed to run the model for {prompt}!")
             print("Exception: ", repr(e))
             raise e
-        return [c.message.content for c in response.choices]
+        return [c.message.content or "" for c in response.choices]
