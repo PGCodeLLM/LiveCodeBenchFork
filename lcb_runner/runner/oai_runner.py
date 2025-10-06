@@ -24,6 +24,8 @@ class OpenAIRunner(BaseRunner):
 
         # Store stream setting
         self.stream = getattr(args, 'stream', False)
+        if self.stream:
+            print("[LCB] Streaming is enabled.")
 
         if model.model_style == LMStyle.OpenAIReasonPreview:
             self.client_kwargs = {
