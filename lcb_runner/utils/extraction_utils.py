@@ -31,6 +31,10 @@ def extract_from_output(model_output: str) -> tuple[str, str]:
         match = re.search(r'<think>(.*?)</think>(.*)', model_output, re.DOTALL)
         if match:
             return match.group(1).strip(), match.group(2).strip()
+        # Handle unclosed <think> tag - treat everything after <think> as reasoning
+        match_unclosed = re.search(r'<think>(.*)', model_output, re.DOTALL)
+        if match_unclosed:
+            return match_unclosed.group(1).strip(), ""
 
     if '[unused' in model_output:
         parts = re.split(r'\[unused\d+\]', model_output)
