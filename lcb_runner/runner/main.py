@@ -24,8 +24,8 @@ def main():
         model = LanguageModelStore[args.model]
     benchmark, format_prompt = build_prompt_benchmark(args)
     if args.debug:
-        print(f"Running with {len(benchmark)} instances in debug mode")
         benchmark = benchmark[:15]
+        print(f"Running with {len(benchmark)} instances in debug mode")
 
     output_path = get_output_path(model.model_repr, args)
     eval_file = output_path.replace(".json", "_eval.json")
@@ -74,12 +74,20 @@ def main():
         args.scenario, results, model, args.cot_code_execution
     )
 
-    save_results = [
-        instance.insert_output(outputs_list, extracted_list)
-        for instance, (outputs_list, extracted_list) in zip(
-            remaining_benchmark, combined_results
-        )
-    ]
+    if args.scenario == Scenario.codegeneration:
+        save_results = [
+            instance.insert_output(outputs_list, extracted_list, reasoning_list, output_list_extracted)
+            for instance, (outputs_list, extracted_list, reasoning_list, output_list_extracted) in zip(
+                remaining_benchmark, combined_results
+            )
+        ]
+    else:
+        save_results = [
+            instance.insert_output(outputs_list, extracted_list)
+            for instance, (outputs_list, extracted_list) in zip(
+                remaining_benchmark, combined_results
+            )
+        ]
 
     if args.continue_existing or args.continue_existing_with_eval:
         save_results += old_save_results
@@ -172,9 +180,9 @@ def main():
                 metadatas = [[] for _ in benchmark]
             save_eval_results = [
                 instance.insert_output_evaluation(
-                    outputs_list, extracted_list, graded_list, metadata=meta
+                    outputs_list, extracted_list, graded_list, reasoning_list, output_list_extracted, metadata=meta
                 )
-                for instance, (outputs_list, extracted_list), graded_list, meta in zip(
+                for instance, (outputs_list, extracted_list, reasoning_list, output_list_extracted), graded_list, meta in zip(
                     benchmark, combined_results, graded, metadatas
                 )
             ]
@@ -224,6 +232,61 @@ def main():
 
         with open(eval_all_file, "w") as f:
             json.dump(save_eval_results, f, indent=4)
+
+        # Generate detailed results file with separated reasoning and output
+        detailed_results_file = eval_all_file.replace("_eval_all.json", "_detailed_results.json")
+        detailed_results = generate_detailed_results(save_eval_results, output_path)
+        with open(detailed_results_file, "w") as f:
+            json.dump(detailed_results, f, indent=2)
+        print(f"Generated detailed results file: {detailed_results_file}")
+
+
+def generate_detailed_results(eval_results, output_path):
+    """
+    Generate detailed results with separated reasoning and output.
+
+    Args:
+        eval_results: List of evaluation results from eval_all.json
+        output_path: Path to the output file (used to extract exp_id)
+
+    Returns:
+        List of detailed result entries with reasoning and output fields
+    """
+    from pathlib import Path
+    from lcb_runner.utils.extraction_utils import extract_from_output
+
+    output_dir = Path(output_path).parent.name
+    exp_id = output_dir.split('--', 1)[1] if '--' in output_dir else output_dir
+
+    detailed_results = []
+
+    for entry in eval_results:
+        task_id = entry.get('question_id', 'unknown')
+        output_list = entry.get('output_list', [])
+        reasoning_list = entry.get('reasoning_list', [])
+
+        if not reasoning_list:
+            reasoning_list = [""] * len(output_list)
+
+        for kth_sample in range(len(output_list)):
+            raw_output = output_list[kth_sample] if kth_sample < len(output_list) else ""
+            reasoning = reasoning_list[kth_sample] if kth_sample < len(reasoning_list) else ""
+            _, output = extract_from_output(raw_output)
+
+            detailed_results.append({
+                'exp_id': exp_id,
+                'task_id': str(task_id),
+                'kth_sample': kth_sample,
+                'reasoning': reasoning,
+                'output': output,
+                'question_title': entry.get('question_title', ''),
+                'difficulty': entry.get('difficulty', ''),
+                'platform': entry.get('platform', ''),
+                'contest_id': entry.get('contest_id', ''),
+                'contest_date': entry.get('contest_date', ''),
+            })
+
+    return detailed_results
 
 
 if __name__ == "__main__":

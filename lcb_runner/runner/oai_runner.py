@@ -50,12 +50,14 @@ class OpenAIRunner(BaseRunner):
             self.client_kwargs = {
                 "model": args.model,
                 "temperature": args.temperature,
-                "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
             }
+
+            if args.max_output_tokens is not None:
+                self.client_kwargs["max_completion_tokens"] = args.max_output_tokens
 
             if args.presence_penalty is not None:
                 self.client_kwargs["presence_penalty"] = args.presence_penalty
@@ -91,6 +93,7 @@ class OpenAIRunner(BaseRunner):
 
                 num_samples = self.client_kwargs.get("n", 1)
                 accumulated_content = [""] * num_samples
+                accumulated_reasoning = [""] * num_samples
                 finish_reasons = [None] * num_samples
                 roles = [None] * num_samples
 
@@ -104,6 +107,10 @@ class OpenAIRunner(BaseRunner):
                                 accumulated_content[idx] += choice.delta.content
                             if choice.delta.role:
                                 roles[idx] = choice.delta.role
+                            if hasattr(choice.delta, 'reasoning_content'):
+                                reasoning = getattr(choice.delta, 'reasoning_content')
+                                if reasoning:
+                                    accumulated_reasoning[idx] += reasoning
                         if choice.finish_reason:
                             finish_reasons[idx] = choice.finish_reason
 
@@ -111,13 +118,16 @@ class OpenAIRunner(BaseRunner):
                 for i in range(num_samples):
                     role = roles[i] if roles[i] else "assistant"
                     finish_reason = finish_reasons[i] if finish_reasons[i] else "stop"
+                    final_content = accumulated_content[i]
+                    if accumulated_reasoning[i]:
+                        final_content = f"[REASONING]{accumulated_reasoning[i]}[/REASONING]{final_content}"
                     choices.append(
                         Choice(
                             index=i,
                             finish_reason=finish_reason,
                             message=ChatCompletionMessage(
                                 role=role,
-                                content=accumulated_content[i],
+                                content=final_content,
                             ),
                         )
                     )
@@ -149,4 +159,11 @@ class OpenAIRunner(BaseRunner):
             print(f"Failed to run the model for {prompt}!")
             print("Exception: ", repr(e))
             raise e
-        return [c.message.content or "" for c in response.choices]
+
+        results = []
+        for c in response.choices:
+            content = c.message.content or ""
+            if hasattr(c.message, 'reasoning_content') and c.message.reasoning_content:
+                content = f"[REASONING]{c.message.reasoning_content}[/REASONING]{content}"
+            results.append(content)
+        return results
