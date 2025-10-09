@@ -54,6 +54,15 @@ def compute_metrics_from_results(results, k_list=[1, 5]):
 
 
 def extract_instance_results(results):
+    """
+    Extract boolean pass/fail grades for each sample.
+
+    Args:
+        results: Dictionary mapping task_id -> list of test results per sample
+
+    Returns:
+        List of boolean lists indicating pass/fail for each sample, sorted by task_id
+    """
     instance_wise_grades = {}
     for task_id, res in results.items():
         instance_wise_grades[task_id] = []
@@ -64,3 +73,24 @@ def extract_instance_results(results):
         v for _, v in sorted(instance_wise_grades.items(), key=lambda item: item[0])
     ]
     return instance_wise_grades
+
+
+def extract_test_results(results):
+    """
+    Extract detailed test case results for each sample.
+
+    Args:
+        results: Dictionary mapping task_id -> list of test results per sample
+                 Each test result is a list of test case outcomes (True/False or error codes)
+
+    Returns:
+        List of test results lists, sorted by task_id, matching benchmark order
+    """
+    test_results_dict = {}
+    for task_id, res in results.items():
+        test_results_dict[task_id] = res
+
+    test_results_list = [
+        v for _, v in sorted(test_results_dict.items(), key=lambda item: item[0])
+    ]
+    return test_results_list

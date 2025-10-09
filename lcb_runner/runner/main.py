@@ -6,7 +6,7 @@ from lcb_runner.utils.scenarios import Scenario
 from lcb_runner.lm_styles import create_generic_openai_model, LanguageModelStore
 from lcb_runner.runner.runner_utils import build_runner
 from lcb_runner.utils.path_utils import get_output_path
-from lcb_runner.evaluation import extract_instance_results
+from lcb_runner.evaluation import extract_instance_results, extract_test_results
 from lcb_runner.runner.scenario_router import (
     build_prompt_benchmark,
     combine_results,
@@ -176,14 +176,16 @@ def main():
         if args.scenario == Scenario.codegeneration:
             if metrics:
                 metadatas = metrics[2]
+                test_results = extract_test_results(metrics[1])
             else:
                 metadatas = [[] for _ in benchmark]
+                test_results = [[] for _ in benchmark]
             save_eval_results = [
                 instance.insert_output_evaluation(
-                    outputs_list, extracted_list, graded_list, reasoning_list, output_list_extracted, metadata=meta
+                    outputs_list, extracted_list, graded_list, reasoning_list, output_list_extracted, test_results_list=test_result, metadata=meta
                 )
-                for instance, (outputs_list, extracted_list, reasoning_list, output_list_extracted), graded_list, meta in zip(
-                    benchmark, combined_results, graded, metadatas
+                for instance, (outputs_list, extracted_list, reasoning_list, output_list_extracted), graded_list, meta, test_result in zip(
+                    benchmark, combined_results, graded, metadatas, test_results
                 )
             ]
             if metrics and old_eval_results:

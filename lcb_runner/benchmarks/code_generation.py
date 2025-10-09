@@ -102,11 +102,14 @@ class CodeGenerationProblem:
         graded_list: list[bool],
         reasoning_list: list[str],
         output_list_extracted: list[str],
+        test_results_list: list[list] = None,
         **kwargs,
     ) -> dict:
         output = self.insert_output(output_list, code_list, reasoning_list, output_list_extracted)
         output["graded_list"] = graded_list
         output["pass@1"] = graded_list.count(True) / len(graded_list)
+        if test_results_list is not None:
+            output["test_results_list"] = test_results_list
         for k, v in kwargs.items():
             output[k] = v
         return output
