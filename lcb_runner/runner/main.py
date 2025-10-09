@@ -245,14 +245,19 @@ def main():
 
 def generate_detailed_results(eval_results, output_path):
     """
-    Generate detailed results with separated reasoning and output.
+    Generate detailed results with separated reasoning and output for each sample.
+
+    Transforms task-level eval_all.json entries (with arrays) into sample-level entries.
 
     Args:
-        eval_results: List of evaluation results from eval_all.json
+        eval_results: List of evaluation results from eval_all.json (task-level)
         output_path: Path to the output file (used to extract exp_id)
 
     Returns:
-        List of detailed result entries with reasoning and output fields
+        List of detailed result entries (sample-level) with fields:
+        - exp_id, task_id, kth_sample, reasoning, output
+        - question_title, difficulty, platform, contest_id, contest_date
+        - passed (bool), test_results (array), metadata (dict)
     """
     from pathlib import Path
     from lcb_runner.utils.extraction_utils import extract_from_output
@@ -266,6 +271,9 @@ def generate_detailed_results(eval_results, output_path):
         task_id = entry.get('question_id', 'unknown')
         output_list = entry.get('output_list', [])
         reasoning_list = entry.get('reasoning_list', [])
+        test_results_list = entry.get('test_results_list', [])
+        metadata_list = entry.get('metadata', [])
+        graded_list = entry.get('graded_list', [])
 
         if not reasoning_list:
             reasoning_list = [""] * len(output_list)
@@ -274,6 +282,10 @@ def generate_detailed_results(eval_results, output_path):
             raw_output = output_list[kth_sample] if kth_sample < len(output_list) else ""
             reasoning = reasoning_list[kth_sample] if kth_sample < len(reasoning_list) else ""
             _, output = extract_from_output(raw_output)
+
+            test_results = test_results_list[kth_sample] if kth_sample < len(test_results_list) else []
+            metadata = metadata_list[kth_sample] if kth_sample < len(metadata_list) else {}
+            passed = graded_list[kth_sample] if kth_sample < len(graded_list) else False
 
             detailed_results.append({
                 'exp_id': exp_id,
@@ -286,6 +298,9 @@ def generate_detailed_results(eval_results, output_path):
                 'platform': entry.get('platform', ''),
                 'contest_id': entry.get('contest_id', ''),
                 'contest_date': entry.get('contest_date', ''),
+                'passed': passed,
+                'test_results': test_results,
+                'metadata': metadata,
             })
 
     return detailed_results
