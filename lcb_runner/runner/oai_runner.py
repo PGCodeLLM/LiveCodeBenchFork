@@ -50,6 +50,7 @@ class OpenAIRunner(BaseRunner):
             self.client_kwargs = {
                 "model": args.model,
                 "temperature": args.temperature,
+                "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "n": args.n,
                 "timeout": args.openai_timeout,
