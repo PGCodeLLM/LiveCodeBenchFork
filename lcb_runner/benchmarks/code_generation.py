@@ -76,8 +76,8 @@ class CodeGenerationProblem:
 
         self.metadata = json.loads(self.metadata)  # type: ignore
 
-    def insert_output(self, output_list: list[str], code_list: list[str]) -> dict:
-        return {
+    def insert_output(self, output_list: list[str], code_list: list[str], reasoning_list: list[str], output_list_extracted: list[str]) -> dict:
+        result = {
             "question_title": self.question_title,
             "question_content": self.question_content,
             "platform": self.platform.value,
@@ -89,17 +89,32 @@ class CodeGenerationProblem:
             "output_list": output_list,
             "code_list": code_list,
         }
+        if reasoning_list is not None:
+            result["reasoning_list"] = reasoning_list
+        if output_list_extracted is not None:
+            result["output_list_extracted"] = output_list_extracted
+        return result
+
+    def get_num_test_cases(self) -> int:
+        """Get total number of test cases (public + private) for this problem."""
+        return len(self.public_test_cases) + len(self.private_test_cases)
 
     def insert_output_evaluation(
         self,
         output_list: list[str],
         code_list: list[str],
         graded_list: list[bool],
+        reasoning_list: list[str],
+        output_list_extracted: list[str],
+        test_results_list: list[list] = None,
         **kwargs,
     ) -> dict:
-        output = self.insert_output(output_list, code_list)
+        output = self.insert_output(output_list, code_list, reasoning_list, output_list_extracted)
         output["graded_list"] = graded_list
         output["pass@1"] = graded_list.count(True) / len(graded_list)
+        output["num_test_cases"] = self.get_num_test_cases()
+        if test_results_list is not None:
+            output["test_results_list"] = test_results_list
         for k, v in kwargs.items():
             output[k] = v
         return output

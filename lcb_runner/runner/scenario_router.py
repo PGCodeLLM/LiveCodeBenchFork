@@ -87,13 +87,15 @@ def combine_results(
     cot_code_execution: bool = False,
 ):
     if scenario == Scenario.codegeneration:
-        combined_results = [
-            (
-                outputs_list,
-                [extract_code(output, model.model_style) for output in outputs_list],
-            )
-            for outputs_list in results
-        ]
+        from lcb_runner.utils.extraction_utils import extract_from_output
+
+        combined_results = []
+        for outputs_list in results:
+            code_list = [extract_code(output, model.model_style) for output in outputs_list]
+            reasoning_and_output = [extract_from_output(output) for output in outputs_list]
+            reasoning_list = [r for r, _ in reasoning_and_output]
+            output_list = [o for _, o in reasoning_and_output]
+            combined_results.append((outputs_list, code_list, reasoning_list, output_list))
     elif scenario == Scenario.testoutputprediction:
         combined_results = [
             (
@@ -146,7 +148,12 @@ def sort_and_extract_save_results(scenario: Scenario, save_results: list[dict]):
     if scenario == Scenario.codegeneration:
         save_results = sorted(save_results, key=lambda x: x["question_id"])
         combined_results = [
-            (save_result_instance["output_list"], save_result_instance["code_list"])
+            (
+                save_result_instance["output_list"],
+                save_result_instance["code_list"],
+                save_result_instance.get("reasoning_list", [""] * len(save_result_instance["code_list"])),
+                save_result_instance.get("output_list_extracted", [""] * len(save_result_instance["output_list"])),
+            )
             for save_result_instance in save_results
         ]
 
@@ -186,7 +193,11 @@ def get_metrics(
     combined_results,
 ):
     eval_samples = [instance.get_evaluation_sample() for instance in benchmark]
-    generations = [extracted for _, extracted in combined_results]
+
+    if scenario == Scenario.codegeneration or scenario == Scenario.selfrepair:
+        generations = [extracted for _, extracted, _, _ in combined_results]
+    else:
+        generations = [extracted for _, extracted in combined_results]
 
     if scenario == Scenario.codegeneration or scenario == Scenario.selfrepair:
         metrics = codegen_metrics(

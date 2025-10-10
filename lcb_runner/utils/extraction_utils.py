@@ -1,4 +1,30 @@
+import re
 from lcb_runner.lm_styles import LMStyle
+
+
+def extract_from_output(model_output: str) -> tuple[str, str]:
+    """
+    Extract both reasoning and output content from model output.
+    [REASONING] tags (from OpenAI/vLLM reasoning_content field)
+
+    NOTE: For some models we might need add parser to properly extract reasoning into reasoning_content field (then the the reasoning content will be added to [REASONING] tag):
+        vllm serve model_name --enable-reasoning --reasoning-parser <parser_name>
+
+    Args:
+        model_output: The full output text from the model
+
+    Returns:
+        tuple[str, str]: (reasoning_content, output_content)
+    """
+    if not model_output:
+        return "", ""
+
+    if model_output.startswith('[REASONING]'):
+        match = re.search(r'\[REASONING\](.*?)\[/REASONING\](.*)', model_output, re.DOTALL)
+        if match:
+            return match.group(1).strip(), match.group(2).strip()
+
+    return "", model_output
 
 
 def extract_code(model_output: str, lmstyle: LMStyle):
