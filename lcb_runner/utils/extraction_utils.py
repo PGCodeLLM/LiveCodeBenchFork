@@ -4,13 +4,10 @@ from lcb_runner.lm_styles import LMStyle
 
 def extract_from_output(model_output: str) -> tuple[str, str]:
     """
-    Extract both reasoning and output content from model output in a single pass.
-    Checks for reasoning in this order:
-    1. [REASONING] tags (from OpenAI/vLLM reasoning_content field)
-    2. <think> tags (fallback for some models if vLLM reasoning parser not enabled)
-    3. [unused##] tags (pangu)
+    Extract both reasoning and output content from model output.
+    [REASONING] tags (from OpenAI/vLLM reasoning_content field)
 
-    NOTE: For some models we might need add parser to properly extract reasoning into reasoning_content field:
+    NOTE: For some models we might need add parser to properly extract reasoning into reasoning_content field (then the the reasoning content will be added to [REASONING] tag):
         vllm serve model_name --enable-reasoning --reasoning-parser <parser_name>
 
     Args:
@@ -26,23 +23,6 @@ def extract_from_output(model_output: str) -> tuple[str, str]:
         match = re.search(r'\[REASONING\](.*?)\[/REASONING\](.*)', model_output, re.DOTALL)
         if match:
             return match.group(1).strip(), match.group(2).strip()
-
-    if '<think>' in model_output:
-        match = re.search(r'<think>(.*?)</think>(.*)', model_output, re.DOTALL)
-        if match:
-            return match.group(1).strip(), match.group(2).strip()
-        # Handle unclosed <think> tag - treat everything after <think> as reasoning
-        match_unclosed = re.search(r'<think>(.*)', model_output, re.DOTALL)
-        if match_unclosed:
-            return match_unclosed.group(1).strip(), ""
-
-    if '[unused' in model_output:
-        parts = re.split(r'\[unused\d+\]', model_output)
-        if len(parts) > 1:
-            reasoning = parts[0].strip() if parts[0] else (parts[1].strip() if len(parts) > 1 else "")
-            reasoning = re.sub(r'\[unused\d+\]\s*', '', reasoning)
-            output = parts[-1].strip()
-            return reasoning, output
 
     return "", model_output
 
