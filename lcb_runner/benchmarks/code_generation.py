@@ -95,6 +95,10 @@ class CodeGenerationProblem:
             result["output_list_extracted"] = output_list_extracted
         return result
 
+    def get_num_test_cases(self) -> int:
+        """Get total number of test cases (public + private) for this problem."""
+        return len(self.public_test_cases) + len(self.private_test_cases)
+
     def insert_output_evaluation(
         self,
         output_list: list[str],
@@ -108,6 +112,7 @@ class CodeGenerationProblem:
         output = self.insert_output(output_list, code_list, reasoning_list, output_list_extracted)
         output["graded_list"] = graded_list
         output["pass@1"] = graded_list.count(True) / len(graded_list)
+        output["num_test_cases"] = self.get_num_test_cases()
         if test_results_list is not None:
             output["test_results_list"] = test_results_list
         for k, v in kwargs.items():
