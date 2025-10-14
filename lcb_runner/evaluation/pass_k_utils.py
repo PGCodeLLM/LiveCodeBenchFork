@@ -64,3 +64,13 @@ def extract_instance_results(results):
         v for _, v in sorted(instance_wise_grades.items(), key=lambda item: item[0])
     ]
     return instance_wise_grades
+
+def extract_test_results(results):
+    test_results_dict = {}
+    for task_id, res in results.items():
+        test_results_dict[task_id] = res
+
+    test_results_list = [
+        v for _, v in sorted(test_results_dict.items(), key=lambda item: item[0])
+    ]
+    return test_results_list
