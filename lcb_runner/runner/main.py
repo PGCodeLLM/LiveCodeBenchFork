@@ -6,7 +6,7 @@ from lcb_runner.utils.scenarios import Scenario
 from lcb_runner.lm_styles import create_generic_openai_model, LanguageModelStore
 from lcb_runner.runner.runner_utils import build_runner
 from lcb_runner.utils.path_utils import get_output_path
-from lcb_runner.evaluation import extract_instance_results
+from lcb_runner.evaluation import extract_instance_results, extract_test_results
 from lcb_runner.runner.scenario_router import (
     build_prompt_benchmark,
     combine_results,
@@ -24,8 +24,8 @@ def main():
         model = LanguageModelStore[args.model]
     benchmark, format_prompt = build_prompt_benchmark(args)
     if args.debug:
-        print(f"Running with {len(benchmark)} instances in debug mode")
         benchmark = benchmark[:15]
+        print(f"Running with {len(benchmark)} instances in debug mode")
 
     output_path = get_output_path(model.model_repr, args)
     eval_file = output_path.replace(".json", "_eval.json")
@@ -168,14 +168,16 @@ def main():
         if args.scenario == Scenario.codegeneration:
             if metrics:
                 metadatas = metrics[2]
+                test_results = extract_test_results(metrics[1])
             else:
                 metadatas = [[] for _ in benchmark]
+                test_results = [[] for _ in benchmark]
             save_eval_results = [
                 instance.insert_output_evaluation(
-                    outputs_list, extracted_list, graded_list, metadata=meta
+                    outputs_list, extracted_list, graded_list, metadata=meta, test_results_list=test_result
                 )
-                for instance, (outputs_list, extracted_list), graded_list, meta in zip(
-                    benchmark, combined_results, graded, metadatas
+                for instance, (outputs_list, extracted_list), graded_list, meta, test_result in zip(
+                    benchmark, combined_results, graded, metadatas, test_results
                 )
             ]
             if metrics and old_eval_results:
@@ -224,6 +226,67 @@ def main():
 
         with open(eval_all_file, "w") as f:
             json.dump(save_eval_results, f, indent=4)
+
+        # Generate detailed results file with separated reasoning and output
+        detailed_results_file = eval_all_file.replace("_eval_all.json", "_detailed_results.json")
+        detailed_results = generate_detailed_results(save_eval_results, output_path)
+        with open(detailed_results_file, "w") as f:
+            json.dump(detailed_results, f, indent=2)
+        print(f"Generated detailed results file: {detailed_results_file}")
+
+
+def generate_detailed_results(eval_results, output_path):
+    """
+    Generate detailed results with separated reasoning and output for each sample.
+
+    Transforms task-level eval_all.json entries (with arrays) into sample-level entries.
+
+    Args:
+        eval_results: List of evaluation results from eval_all.json (task-level)
+        output_path: Path to the output file (used to extract exp_id)
+
+    Returns:
+        List of detailed result entries (sample-level) with fields:
+        - exp_id, task_id, kth_sample, reasoning, output
+        - question_title, difficulty, platform, contest_id, contest_date
+        - passed (bool), test_results (array), metadata (dict)
+    """
+    from pathlib import Path
+
+    output_dir = Path(output_path).parent.name
+    exp_id = output_dir.split('--', 1)[1] if '--' in output_dir else output_dir
+    
+    detailed_results = []
+
+    for entry in eval_results:
+        task_id = entry.get('question_id', 'unknown')
+        output_list = entry.get('output_list', [])
+        test_results_list = entry.get('test_results_list', [])
+        metadata_list = entry.get('metadata', [])
+        graded_list = entry.get('graded_list', [])
+
+        for kth_sample in range(len(output_list)):
+            output = output_list[kth_sample] if kth_sample < len(output_list) else ""
+            test_results = test_results_list[kth_sample] if kth_sample < len(test_results_list) else []
+            metadata = metadata_list[kth_sample] if kth_sample < len(metadata_list) else {}
+            passed = graded_list[kth_sample] if kth_sample < len(graded_list) else False
+
+            detailed_results.append({
+                'exp_id': exp_id,
+                'task_id': str(task_id),
+                'kth_sample': kth_sample,
+                'output': output,
+                'question_title': entry.get('question_title', ''),
+                'difficulty': entry.get('difficulty', ''),
+                'platform': entry.get('platform', ''),
+                'contest_id': entry.get('contest_id', ''),
+                'contest_date': entry.get('contest_date', ''),
+                'passed': passed,
+                'test_results': test_results,
+                'metadata': metadata,
+            })
+
+    return detailed_results
 
 
 if __name__ == "__main__":
