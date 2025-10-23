@@ -50,12 +50,13 @@ class OpenAIRunner(BaseRunner):
             self.client_kwargs = {
                 "model": args.model,
                 "temperature": args.temperature,
-                "max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
             }
+            if args.max_tokens is not None:
+                self.client_kwargs["max_tokens"] = args.max_tokens
 
             if args.presence_penalty is not None:
                 self.client_kwargs["presence_penalty"] = args.presence_penalty
