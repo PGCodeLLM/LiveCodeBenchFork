@@ -159,9 +159,15 @@ def load_code_generation_dataset(release_version="release_v1", start_date=None, 
         "private_test_cases": Value("string"),
         "metadata": Value("string"),
     })
-    
-    dataset = load_dataset("json", data_files=data_files[release_version], split="train", features=features)
-    dataset = [CodeGenerationProblem(**p) for p in dataset]  # type: ignore
+
+    # Handle 'all' by loading all release_v* versions
+    if release_version == "all":
+        all_files = [data_files[k] for k in sorted(data_files.keys()) if k.startswith("release_v")]
+        dataset = load_dataset("json", data_files=all_files, split="train", features=features)
+        dataset = [CodeGenerationProblem(**p) for p in dataset]
+    else:
+        dataset = load_dataset("json", data_files=data_files[release_version], split="train", features=features)
+        dataset = [CodeGenerationProblem(**p) for p in dataset]
     if start_date is not None:
         p_start_date = datetime.strptime(start_date, "%Y-%m-%d")
         dataset = [e for e in dataset if p_start_date <= e.contest_date]
