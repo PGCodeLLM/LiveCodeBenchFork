@@ -1,3 +1,4 @@
+import os.path
 import pathlib
 
 from lcb_runner.lm_styles import LanguageModel, LMStyle
@@ -11,12 +12,24 @@ def ensure_dir(path: str, is_file=True):
         pathlib.Path(path).mkdir(parents=True, exist_ok=True)
     return
 
+def get_cache_dir(args) -> str:
+    if os.path.isabs(args.output_dir):
+        return os.path.join(args.output_dir, "cache")
+    else:
+        return f"cache/{args.output_dir}"
+
+def get_output_dir(args) -> str:
+    if os.path.isabs(args.output_dir):
+        return args.output_dir
+    else:
+        return f"output/{args.output_dir}"
+
 
 def get_cache_path(model_repr:str, args) -> str:
     scenario: Scenario = args.scenario
     n = args.n
     temperature = args.temperature
-    path = f"cache/{args.output_dir}/{scenario}_{n}_{temperature}.json"
+    path = f"{get_cache_dir(args)}/{scenario}_{n}_{temperature}.json"
     ensure_dir(path)
     return path
 
@@ -26,7 +39,7 @@ def get_output_path(model_repr:str, args) -> str:
     n = args.n
     temperature = args.temperature
     cot_suffix = "_cot" if args.cot_code_execution else ""
-    path = f"output/{args.output_dir}/{scenario}_{n}_{temperature}{cot_suffix}.json"
+    path = f"{get_output_dir(args)}/{scenario}_{n}_{temperature}{cot_suffix}.json"
     ensure_dir(path)
     return path
 
@@ -36,10 +49,10 @@ def get_eval_all_output_path(model_repr:str, args) -> str:
     n = args.n
     temperature = args.temperature
     cot_suffix = "_cot" if args.cot_code_execution else ""
-    path = f"output/{args.output_dir}/{scenario}_{n}_{temperature}{cot_suffix}_eval_all.json"
+    path = f"{get_output_dir(args)}/{scenario}_{n}_{temperature}{cot_suffix}_eval_all.json"
     return path
 
 def get_progress_path(args) -> str:
-    path = f"output/{args.output_dir}/progress.json"
+    path = f"{get_output_dir(args)}/progress.json"
     ensure_dir(path)
     return path
