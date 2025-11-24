@@ -231,16 +231,24 @@ def grade_call_based(
 ):
     # call-based clean up logic
     # need to wrap in try-catch logic after to catch the correct errors, but for now this is fine.
+    num_test_cases = len(all_inputs)
+
     code = import_string + "\n\n" + code
     compiled_sol = compile_code(code, timeout)
 
     if compiled_sol is None:
-        return
+        return [-4] * num_test_cases, {
+            "error_code": -4,
+            "error_message": "Compilation failed",
+        }
 
     method = get_function(compiled_sol, fn_name)
 
     if method is None:
-        return
+        return [-4] * num_test_cases, {
+            "error_code": -4,
+            "error_message": f"Function '{fn_name}' not found",
+        }
 
     all_inputs = [
         [json.loads(line) for line in inputs.split("\n")] for inputs in all_inputs
@@ -322,6 +330,8 @@ def grade_stdio(
     all_outputs: list,
     timeout: int,
 ):
+    num_test_cases = len(all_inputs)
+
     ## runtime doesn't interact well with __name__ == '__main__'
     code = clean_if_name(code)
 
@@ -330,12 +340,18 @@ def grade_stdio(
 
     compiled_sol = compile_code(code, timeout)
     if compiled_sol is None:
-        return
+        return [-4] * num_test_cases, {
+            "error_code": -4,
+            "error_message": "Compilation failed",
+        }
 
     method = get_function(compiled_sol, "wrapped_function")
 
     if method is None:
-        return
+        return [-4] * num_test_cases, {
+            "error_code": -4,
+            "error_message": "Function 'wrapped_function' not found",
+        }
 
     all_results = []
     total_execution_time = 0
