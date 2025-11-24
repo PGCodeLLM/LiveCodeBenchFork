@@ -33,31 +33,30 @@ class PromptConstants:
 
 
 def get_check_prompt(question: str, result, metadata):
-    ## assumes i/o examples are already truncated!
-    ## less pressure on storing 10 MB json because on a single large input-output pair
-    # result_by_test_case = result
-    # assert len(metadata) == 1, f"metadata = {metadata}"
-    # metadata = metadata[0]
     metadata = json.loads(metadata)
-    if "error_code" not in metadata:
+
+    # Check if there are any failed tests
+    if "failed_tests" not in metadata or len(metadata["failed_tests"]) == 0:
         return ""
-    if metadata["error_code"] == -1:
-        # time limit exceeded
-        message = f"The above code is incorrect and got the following compilation error.\n{metadata['error']}"
-    elif metadata["error_code"] == -2:
+
+    # Use the first failed test for repair
+    first_failure = metadata["failed_tests"][0]
+    error_code = first_failure["error_code"]
+
+    if error_code == -2:
         # wrong answer
-        message = f"The above code is incorrect and got a wrong answer.\nInput: {metadata['inputs']}\nGenerated Output: {metadata['output']}\nExpected: {metadata['expected']}"
-    elif metadata["error_code"] == -3:
+        message = f"The above code is incorrect and got a wrong answer.\nInput: {first_failure['inputs']}\nGenerated Output: {first_failure['output']}\nExpected: {first_failure['expected']}"
+    elif error_code == -3:
         # time limit exceeded
-        message = f"The above code is incorrect and got time limit exceeded.\n{metadata['error']}\nInput: {metadata['inputs']}\nExpected: {metadata['expected']}"
-        pass
-    elif metadata["error_code"] == -4:
+        message = f"The above code is incorrect and got time limit exceeded.\n{first_failure['error']}\nInput: {first_failure['inputs']}\nExpected: {first_failure['expected']}"
+    elif error_code == -4:
         # runtime error
-        message = f"The above code is incorrect and got a runtime error.\nInput: {metadata['inputs']}\nExpected: {metadata['expected']}\n{metadata['error']}"
+        message = f"The above code is incorrect and got a runtime error.\nInput: {first_failure['inputs']}\nExpected: {first_failure['expected']}\n{first_failure['error']}"
     else:
         raise NotImplementedError(
-            f"metadata['error_code'] = {metadata['error_code']} not implemented || {metadata=}"
+            f"error_code = {error_code} not implemented || {first_failure=}"
         )
+
     return message
 
 
