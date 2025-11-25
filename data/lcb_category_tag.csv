@@ -1,0 +1,176 @@
+question_id,platform,category,tag
+3674,leetcode,"Data Structures,Common Techniques","Queue,Two-Pointer Technique"
+3677,leetcode,"Dynamic Programming,Algorithm Basics","Other Dynamic Programming Methods,Recurrence"
+3687,leetcode,"Search Algorithms,Mathematics,Algorithm Basics,Common Techniques","Depth-First Search (DFS),Pigeonhole Principle,Recursion,Two-Pointer Technique"
+3692,leetcode,"String Algorithms,Dynamic Programming","Knuth-Morris-Pratt (KMP) Algorithm,Other Dynamic Programming Methods"
+3696,leetcode,"Mathematics,Dynamic Programming,Data Structures,Common Techniques,Algorithm Basics","Combinatorics,Digit Dynamic Programming,Hash Table,Prefix Sum & Difference,Recurrence"
+3697,leetcode,"Search Algorithms,Algorithm Basics,Mathematics,Algorithm Basics,Algorithm Basics","Backtracking,Brute Force,Combinatorics,Enumeration,Recursion"
+3701,leetcode,"Search Algorithms,Dynamic Programming,Algorithm Basics","Depth-First Search (DFS),Memoization Search,Recursion"
+3704,leetcode,Algorithm Basics,Ad-hoc
+3705,leetcode,"Algorithm Basics,Data Structures","Brute Force,Hash Table"
+3708,leetcode,Algorithm Basics,Simulation
+3709,leetcode,,
+3714,leetcode,"Mathematics,Algorithm Basics","Combinatorics,Sorting"
+3717,leetcode,"Mathematics,Dynamic Programming,Algorithm Basics","Order Theory,Other Dynamic Programming Methods,Sorting"
+3720,leetcode,"Algorithm Basics,Search Algorithms,Graph Theory,Graph Theory,Data Structures,Data Structures,Algorithm Basics","Binary Search,Breadth-First Search (BFS),Connectivity,Graph Representation,Hash Table,Queue,Simulation"
+3721,leetcode,"Algorithm Basics,Algorithm Basics","Simulation,Sorting"
+3722,leetcode,"Dynamic Programming,Common Techniques,Algorithm Basics","Other Dynamic Programming Methods,Prefix Sum & Difference,Recurrence"
+3723,leetcode,Algorithm Basics,Ad-hoc
+3725,leetcode,"Mathematics,Data Structures","Combinatorics,Monotonic Stacks"
+3731,leetcode,Common Techniques,Prefix Sum & Difference
+3733,leetcode,"Common Techniques,Search Algorithms,Dynamic Programming,Algorithm Basics","Bit Manipulation,Depth-First Search (DFS),Memoization Search,Recursion"
+3736,leetcode,"Algorithm Basics,Data Structures","Brute Force,Hash Table"
+3737,leetcode,"Search Algorithms,Common Techniques,Dynamic Programming,Algorithm Basics,Algorithm Basics","Backtracking,Meet in Middle,Memoization Search,Recurrence,Recursion"
+3739,leetcode,"Algorithm Basics,Mathematics,Algorithm Basics,Computational Geometry","Brute Force,Combinatorics,Enumeration,Manhattan Distance"
+3743,leetcode,"Algorithm Basics,Algorithm Basics,Common Techniques","Ad-hoc,Greedy,Prefix Sum & Difference"
+3744,leetcode,"Dynamic Programming,Common Techniques,Algorithm Basics","Other Dynamic Programming Methods,Prefix Sum & Difference,Recurrence"
+3747,leetcode,,
+3748,leetcode,"Data Structures,Algorithm Basics","Heap,Sorting"
+3750,leetcode,"Algorithm Basics,Data Structures","Constructive Algorithms,Hash Table"
+3751,leetcode,Common Techniques,Prefix Sum & Difference
+3753,leetcode,"Algorithm Basics,Data Structures","Greedy,Hash Table"
+3754,leetcode,"Algorithm Basics,Computational Geometry,Algorithm Basics","Greedy,Manhattan Distance,Simulation"
+3759,leetcode,"Algorithm Basics,Data Structures","Greedy,Heap"
+3760,leetcode,"Algorithm Basics,Data Structures,Mathematics","Constructive Algorithms,Hash Table,Sieve Method"
+3762,leetcode,"Algorithm Basics,Algorithm Basics","Binary Search,Greedy"
+3763,leetcode,"Common Techniques,Algorithm Basics,Common Techniques,Data Structures,Algorithm Basics,Algorithm Basics,Computational Geometry","Discretization,Divide and Conquer,Hanging Line Method,Segment Tree,Simulation,Sorting,Sweep Line"
+3764,leetcode,"Algorithm Basics,Algorithm Basics","Greedy,Sorting"
+3765,leetcode,"Search Algorithms,Dynamic Programming,Common Techniques,Algorithm Basics,Algorithm Basics","Depth-First Search (DFS),Memoization Search,Prefix Sum & Difference,Recurrence,Recursion"
+3768,leetcode,Algorithm Basics,Simulation
+3770,leetcode,"Algorithm Basics,Algorithm Basics,Algorithm Basics,String Algorithms","Constructive Algorithms,Greedy,Simulation,String Matching"
+3771,leetcode,"Algorithm Basics,Algorithm Basics,Data Structures,Algorithm Basics","Brute Force,Greedy,Hash Table,Sorting"
+3773,leetcode,"Algorithm Basics,Algorithm Basics","Greedy,Simulation"
+3776,leetcode,"Search Algorithms,Mathematics,Data Structures,Dynamic Programming,Algorithm Basics,Algorithm Basics","Backtracking,Combinatorics,Hash Table,Memoization Search,Recursion,Sorting"
+3777,leetcode,"Search Algorithms,Mathematics,Dynamic Programming,Algorithm Basics","Backtracking,Combinatorics,Memoization Search,Recursion"
+3778,leetcode,Common Techniques,Binary Thinking
+3779,leetcode,"Algorithm Basics,Algorithm Basics","Greedy,Sorting"
+3781,leetcode,"Algorithm Basics,Common Techniques,Computational Geometry,Mathematics,Algorithm Basics,Algorithm Basics","Binary Search,Discretization,Manhattan Distance,Numerical Algorithms,Simulation,Sorting"
+3783,leetcode,"Mathematics,Algorithm Basics,Dynamic Programming,Algorithm Basics,Algorithm Basics","Combinatorics,Constructive Algorithms,Counting Dynamic Programming,Recurrence,Recursion"
+3784,leetcode,"Algorithm Basics,Common Techniques,Algorithm Basics,Data Structures","Binary Search,Binary Thinking,Enumeration,Hash Table"
+3785,leetcode,"Common Techniques,Algorithm Basics","Differences,Greedy"
+3786,leetcode,"Mathematics,Dynamic Programming,Dynamic Programming,Algorithm Basics","Combinatorics,Interval Dynamic Programming,Knapsack Dynamic Programming,Recurrence"
+3788,leetcode,"Mathematics,Algorithm Basics","Binary Set Operations,Greedy"
+3789,leetcode,Algorithm Basics,Ad-hoc
+3791,leetcode,"Algorithm Basics,Data Structures,Common Techniques","Greedy,Hash Table,Two-Pointer Technique"
+3793,leetcode,"Dynamic Programming,Algorithm Basics","Memoization Search,Recursion"
+3794,leetcode,"Algorithm Basics,Common Techniques,Mathematics","Greedy,Prefix Sum & Difference,Schedules"
+3795,leetcode,"Algorithm Basics,Common Techniques","Binary Search,Prefix Sum & Difference"
+3799,leetcode,"Mathematics,Algorithm Basics","Combinatorics,Enumeration"
+3801,leetcode,"Mathematics,Dynamic Programming,Algorithm Basics","Combinatorics,Digit Dynamic Programming,Recurrence"
+3805,leetcode,Algorithm Basics,Enumeration
+3809,leetcode,"Mathematics,Algorithm Basics,Graph Theory,Data Structures","Binary Set Operations,Brute Force,Connectivity,Disjoint Set Union"
+3811,leetcode,Algorithm Basics,Ad-hoc
+3817,leetcode,Algorithm Basics,Ad-hoc
+3832,leetcode,"Algorithm Basics,Algorithm Basics","Greedy,Recurrence"
+abc387_a,atcoder,,
+abc387_b,atcoder,Algorithm Basics,Enumeration
+abc387_c,atcoder,"Mathematics,Algorithm Basics,Dynamic Programming","Combinatorics,Constructive Algorithms,Digit Dynamic Programming"
+abc387_f,atcoder,"Mathematics,Search Algorithms,Common Techniques,Algorithm Basics,Graph Theory,Graph Theory,Dynamic Programming","Combinatorics,Depth-First Search (DFS),Prefix Sum & Difference,Simulation,Strongly Connected Components,Tree Decomposition,Tree Dynamic Programming"
+abc388_a,atcoder,,
+abc388_b,atcoder,,
+abc388_c,atcoder,"Algorithm Basics,Algorithm Basics","Binary Search,Sorting"
+abc388_d,atcoder,"Algorithm Basics,Mathematics,Data Structures","Constructive Algorithms,Numerical Algorithms,Segment Tree"
+abc388_e,atcoder,Common Techniques,Two-Pointer Technique
+abc388_f,atcoder,"Search Algorithms,Data Structures,Dynamic Programming,Algorithm Basics","Backtracking,Hash Table,Memoization Search,Recursion"
+abc388_g,atcoder,"Mathematics,Data Structures,Common Techniques","Numerical Algorithms,Segment Tree,Two-Pointer Technique"
+abc389_a,atcoder,,
+abc389_b,atcoder,,
+abc389_d,atcoder,"Algorithm Basics,Mathematics","Binary Search,Numerical Algorithms"
+abc389_e,atcoder,Algorithm Basics,Binary Search
+abc389_f,atcoder,Data Structures,Segment Tree
+abc389_g,atcoder,"Mathematics,Dynamic Programming,Mathematics,Algorithm Basics,Graph Theory","Combinatorics,Counting Dynamic Programming,Polynomials,Recurrence,Shortest Path"
+abc390_a,atcoder,Algorithm Basics,Ad-hoc
+abc390_b,atcoder,Algorithm Basics,Ad-hoc
+abc390_c,atcoder,Algorithm Basics,Ad-hoc
+abc390_d,atcoder,"Search Algorithms,Mathematics,Search Algorithms","Backtracking,Combinatorics,Depth-First Search (DFS)"
+abc390_e,atcoder,"Algorithm Basics,Common Techniques,Dynamic Programming,Algorithm Basics","Binary Search,Binary Thinking,Knapsack Dynamic Programming,Recurrence"
+abc390_f,atcoder,"Algorithm Basics,Data Structures","Greedy,Hash Table"
+abc390_g,atcoder,"Mathematics,Algorithm Basics,Dynamic Programming,Mathematics,Algorithm Basics,Data Structures,Mathematics","Combinatorics,Divide and Conquer,Dynamic Programming Optimization,Fast Fourier Transform (FFT),Greedy,Heap,Polynomials"
+abc391_a,atcoder,Algorithm Basics,Ad-hoc
+abc391_b,atcoder,Algorithm Basics,Brute Force
+abc391_d,atcoder,Algorithm Basics,Sorting
+abc391_e,atcoder,"Algorithm Basics,Dynamic Programming,Algorithm Basics,Data Structures","Divide and Conquer,Interval Dynamic Programming,Recursion,Segment Tree"
+abc391_f,atcoder,"Algorithm Basics,Data Structures,Data Structures,Search Algorithms,Algorithm Basics","Greedy,Hash Table,Heap,Heuristic Search,Sorting"
+abc391_g,atcoder,"Mathematics,Dynamic Programming","Combinatorics,Counting Dynamic Programming"
+abc392_a,atcoder,Algorithm Basics,Enumeration
+abc392_b,atcoder,,
+abc392_c,atcoder,,
+abc392_d,atcoder,"Data Structures,Mathematics","Hash Table,Probability Theory"
+abc392_f,atcoder,Data Structures,Block Structure
+abc392_g,atcoder,Mathematics,Fast Fourier Transform (FFT)
+abc393_a,atcoder,Algorithm Basics,Ad-hoc
+abc393_b,atcoder,"Algorithm Basics,String Algorithms","Brute Force,String Matching"
+abc393_d,atcoder,Algorithm Basics,Greedy
+abc393_e,atcoder,Mathematics,Greatest Common Divisor (GCD) and Extended GCD (ExGCD)
+abc393_f,atcoder,"Algorithm Basics,Algorithm Basics,Dynamic Programming","Binary Search,Greedy,Other Dynamic Programming Methods"
+abc394_a,atcoder,,
+abc394_b,atcoder,Algorithm Basics,Sorting
+abc394_c,atcoder,"Algorithm Basics,String Algorithms","Simulation,String Matching"
+abc394_d,atcoder,"Algorithm Basics,Algorithm Basics,Data Structures","Greedy,Simulation,Stack"
+abc394_e,atcoder,"Algorithm Basics,Search Algorithms,Dynamic Programming,Data Structures,Graph Theory","Ad-hoc,Breadth-First Search (BFS),Other Dynamic Programming Methods,Queue,Shortest Path"
+abc394_f,atcoder,"Algorithm Basics,Graph Theory,Dynamic Programming","Divide and Conquer,Tree Decomposition,Tree Dynamic Programming"
+abc394_g,atcoder,"Graph Theory,Data Structures,Algorithm Basics","Connectivity,Disjoint Set Union,Doubling"
+abc395_a,atcoder,Algorithm Basics,Ad-hoc
+abc395_b,atcoder,Algorithm Basics,Simulation
+abc395_c,atcoder,Data Structures,Hash Table
+abc395_e,atcoder,"Common Techniques,Algorithm Basics,Data Structures,Dynamic Programming,Graph Theory","Binary Thinking,Greedy,Heap,Memoization Search,Shortest Path"
+abc395_f,atcoder,"Algorithm Basics,Algorithm Basics","Binary Search,Greedy"
+abc396_a,atcoder,Algorithm Basics,Brute Force
+abc396_b,atcoder,"Algorithm Basics,Data Structures","Simulation,Stack"
+abc396_c,atcoder,"Algorithm Basics,Common Techniques,Algorithm Basics,Common Techniques","Greedy,Prefix Sum & Difference,Sorting,Two-Pointer Technique"
+abc396_d,atcoder,Algorithm Basics,Enumeration
+abc396_e,atcoder,"Common Techniques,Common Techniques,Search Algorithms,Mathematics,Data Structures","Binary Thinking,Bit Manipulation,Depth-First Search (DFS),Linear Basis,Stack"
+abc396_f,atcoder,"Mathematics,Data Structures,Data Structures","Combinatorics,Fenwick Tree,Segment Tree"
+abc396_g,atcoder,"Algorithm Basics,Algorithm Basics,Mathematics","Divide and Conquer,Doubling,Fast Fourier Transform (FFT)"
+abc397_a,atcoder,Algorithm Basics,Ad-hoc
+abc397_b,atcoder,,
+abc397_c,atcoder,"Data Structures,Algorithm Basics,Common Techniques","Hash Table,Simulation,Two-Pointer Technique"
+abc397_d,atcoder,Mathematics,Indeterminate Equations
+abc397_e,atcoder,"Algorithm Basics,Graph Theory","Recursion,Tree Decomposition"
+abc397_f,atcoder,"Dynamic Programming,Common Techniques,Data Structures","Dynamic Programming Optimization,Prefix Sum & Difference,Segment Tree"
+abc397_g,atcoder,Mathematics,Linear Programming
+abc398_a,atcoder,Algorithm Basics,Constructive Algorithms
+abc398_b,atcoder,Algorithm Basics,Ad-hoc
+abc398_c,atcoder,Data Structures,Hash Table
+abc398_d,atcoder,Data Structures,Hash Table
+abc398_f,atcoder,"Algorithm Basics,String Algorithms","Greedy,Z-function"
+abc398_g,atcoder,"Algorithm Basics,Graph Theory,Search Algorithms,Mathematics,Data Structures","Ad-hoc,Bipartite Graph,Breadth-First Search (BFS),Game Theory,Queue"
+abc399_a,atcoder,,
+abc399_b,atcoder,Algorithm Basics,Brute Force
+abc399_c,atcoder,"Search Algorithms,Data Structures","Breadth-First Search (BFS),Queue"
+abc399_d,atcoder,Algorithm Basics,Ad-hoc
+abc399_e,atcoder,"Graph Theory,Data Structures","Connectivity,Disjoint Set Union"
+abc399_f,atcoder,"Mathematics,Mathematics,Common Techniques,Algorithm Basics","Combinatorics,Polynomials,Prefix Sum & Difference,Recurrence"
+abc400_a,atcoder,,
+abc400_b,atcoder,,
+abc400_c,atcoder,Mathematics,Combinatorics
+abc400_d,atcoder,"Search Algorithms,Data Structures,Graph Theory,Algorithm Basics","Breadth-First Search (BFS),Queue,Shortest Path,Simulation"
+abc400_e,atcoder,"Algorithm Basics,Algorithm Basics,Mathematics,Algorithm Basics","Binary Search,Enumeration,Sieve Method,Sorting"
+abc400_g,atcoder,"Algorithm Basics,Common Techniques,Dynamic Programming,Mathematics","Binary Search,Bit Manipulation,Bitmask Dynamic Programming,Numerical Algorithms"
+arc190_a,atcoder,"Algorithm Basics,Algorithm Basics","Greedy,Sorting"
+arc190_c,atcoder,"Mathematics,Dynamic Programming","Combinatorics,Counting Dynamic Programming"
+arc190_d,atcoder,"Algorithm Basics,Mathematics","Divide and Conquer,Fast Exponentiation"
+arc191_a,atcoder,"Algorithm Basics,Algorithm Basics","Constructive Algorithms,Greedy"
+arc191_c,atcoder,Algorithm Basics,Ad-hoc
+arc191_d,atcoder,"Search Algorithms,Algorithm Basics,Data Structures,Graph Theory,Algorithm Basics","Breadth-First Search (BFS),Constructive Algorithms,Queue,Shortest Path,Simulation"
+arc192_a,atcoder,,
+arc192_b,atcoder,"Algorithm Basics,Mathematics","Ad-hoc,Game Theory"
+arc192_d,atcoder,"Mathematics,Dynamic Programming,Mathematics,Algorithm Basics","Combinatorics,Counting Dynamic Programming,Prime Factorization,Recurrence"
+arc192_e,atcoder,Mathematics,Combinatorics
+arc193_a,atcoder,"Algorithm Basics,Common Techniques,Mathematics,Algorithm Basics","Binary Search,Discretization,Numerical Algorithms,Sorting"
+arc193_b,atcoder,"Mathematics,Dynamic Programming,Algorithm Basics","Combinatorics,Other Dynamic Programming Methods,Recurrence"
+arc193_d,atcoder,"Algorithm Basics,Common Techniques","Ad-hoc,Two-Pointer Technique"
+arc194_a,atcoder,"Common Techniques,Dynamic Programming,Algorithm Basics","Binary Thinking,Other Dynamic Programming Methods,Recurrence"
+arc194_b,atcoder,"Data Structures,Mathematics","Fenwick Tree,Numerical Algorithms"
+arc194_c,atcoder,"Algorithm Basics,Algorithm Basics,Common Techniques,Algorithm Basics","Binary Search,Greedy,Prefix Sum & Difference,Sorting"
+arc194_d,atcoder,"Mathematics,Dynamic Programming","Combinatorics,Counting Dynamic Programming"
+arc194_e,atcoder,Algorithm Basics,Ad-hoc
+arc195_a,atcoder,Algorithm Basics,Greedy
+arc195_b,atcoder,"Algorithm Basics,Data Structures,Mathematics","Enumeration,Hash Table,Pigeonhole Principle"
+arc195_c,atcoder,"Algorithm Basics,Algorithm Basics","Constructive Algorithms,Simulation"
+arc195_d,atcoder,"Algorithm Basics,Common Techniques","Greedy,Two-Pointer Technique"
+arc195_e,atcoder,"Mathematics,Common Techniques","Combinatorics,Prefix Sum & Difference"
+arc196_a,atcoder,"Algorithm Basics,Data Structures,Algorithm Basics","Greedy,Heap,Sorting"
+arc196_b,atcoder,"Search Algorithms,Mathematics,Graph Theory,Data Structures,Algorithm Basics","Breadth-First Search (BFS),Combinatorics,Connectivity,Disjoint Set Union,Simulation"
+arc196_c,atcoder,"Algorithm Basics,Dynamic Programming,Mathematics,Common Techniques","Divide and Conquer,Dynamic Programming Optimization,Fast Fourier Transform (FFT),Meet in Middle"
+arc196_d,atcoder,"Algorithm Basics,Data Structures,Mathematics,Data Structures","Greedy,Heap,Schedules,Segment Tree"
