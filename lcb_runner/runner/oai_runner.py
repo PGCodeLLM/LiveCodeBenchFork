@@ -1,4 +1,5 @@
 import json
+import fcntl
 from time import sleep
 from pathlib import Path
 
@@ -134,10 +135,7 @@ class OpenAIRunner(BaseRunner):
 
         try:
             output_dir = Path(self.args.output_dir)
-            # Only create directory if it doesn't exist (avoid repeated checks)
-            if not output_dir.exists():
-                output_dir.mkdir(parents=True, exist_ok=True)
-
+            output_dir.mkdir(parents=True, exist_ok=True)
             reasoning_file = output_dir / "reasoning_result.jsonl"
 
             # Prepare reasoning data (only save responses with reasoning content)
@@ -159,8 +157,14 @@ class OpenAIRunner(BaseRunner):
                     })
 
             line = json.dumps(reasoning_data) + '\n'
+
             with open(reasoning_file, 'a') as f:
-                f.write(line)
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                try:
+                    f.write(line)
+                    f.flush()
+                finally:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
 
         except Exception as e:
             # Don't fail the entire run just because we couldn't save reasoning
