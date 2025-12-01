@@ -508,6 +508,11 @@ def run_test(sample, test=None, debug=False, timeout=6):
     if test is None:
         assert False, "should not happen: test code is none"
         return in_outs, {"error": "no test code provided"}
+    elif test == "":
+        return [-6], {
+            "error_code": -6,
+            "error_message": "code is empty; model output may be empty due to failed inference requests or incorrect format"
+        }
     elif test is not None:
         results = []
         sol = import_string
