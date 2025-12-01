@@ -131,9 +131,9 @@ def run_tasks_in_parallel_iter(
         max_tasks=0 if max_tasks_per_worker is None else max_tasks_per_worker,
         context=mp.get_context(mode),
     ) as pool:
-        future = pool.map(func, tasks, timeout=timeout_per_task)
+        # Schedule all tasks
+        futures = [pool.schedule(func, args=(task,), timeout=timeout_per_task) for task in tasks]
 
-        iterator = future.result()
         if use_progress_bar:
             pbar = tqdm(
                 desc=progress_bar_desc,
@@ -147,22 +147,37 @@ def run_tasks_in_parallel_iter(
 
         succ = timeouts = exceptions = expirations = 0
 
-        while True:
+        # Process results as they complete
+        from concurrent.futures import as_completed
+        
+        # Create a mapping from future to original index
+        future_to_index = {future: idx for idx, future in enumerate(futures)}
+        
+        # Store results with their original indices
+        results_with_indices = []
+        
+        for future in as_completed(futures):
+            original_index = future_to_index[future]
+            
             try:
-                result = next(iterator)
+                result = future.result()
 
-            except StopIteration:
-                break
+                task_result = TaskResult(
+                    status=TaskRunStatus.SUCCESS,
+                    result=result,
+                )
+
+                succ += 1
 
             except TimeoutError as error:
-                yield TaskResult(
+                task_result = TaskResult(
                     status=TaskRunStatus.TIMEOUT,
                 )
 
                 timeouts += 1
 
             except ProcessExpired as error:
-                yield TaskResult(
+                task_result = TaskResult(
                     status=TaskRunStatus.PROCESS_EXPIRED,
                 )
                 expirations += 1
@@ -170,19 +185,13 @@ def run_tasks_in_parallel_iter(
             except Exception as error:
                 exception_tb = traceback.format_exc()
 
-                yield TaskResult(
+                task_result = TaskResult(
                     status=TaskRunStatus.EXCEPTION,
                     exception_tb=exception_tb,
                 )
                 exceptions += 1
 
-            else:
-                yield TaskResult(
-                    status=TaskRunStatus.SUCCESS,
-                    result=result,
-                )
-
-                succ += 1
+            results_with_indices.append((original_index, task_result))
 
             if pbar is not None:
                 pbar.update(1)
@@ -191,6 +200,11 @@ def run_tasks_in_parallel_iter(
                 )
                 sys.stdout.flush()
                 sys.stderr.flush()
+        
+        # Sort by original index and yield in submission order
+        results_with_indices.sort(key=lambda x: x[0])
+        for _, task_result in results_with_indices:
+            yield task_result
 
 
 def run_tasks_in_parallel(
@@ -202,7 +216,7 @@ def run_tasks_in_parallel(
     progress_bar_desc: Optional[str] = None,
     max_tasks_per_worker: Optional[int] = None,
     use_spawn: bool = True,
-    progress_file: str =None
+    progress_file: Optional[str] = None
 ) -> List[TaskResult]:
     """
     Args:
