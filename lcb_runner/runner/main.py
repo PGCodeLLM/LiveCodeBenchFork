@@ -261,17 +261,25 @@ def generate_detailed_results(eval_results, output_path):
     reasoning_file = Path(output_path).parent / "reasoning_result.jsonl"
     if reasoning_file.exists():
         try:
+            malformed_lines = 0
             with open(reasoning_file, 'r') as f:
-                for line in f:
+                for line_num, line in enumerate(f, 1):
                     try:
                         data = json.loads(line.strip())
                         for response in data.get('responses', []):
                             content = response.get('content', '')
                             reasoning_content = response.get('reasoning_content', '')
-                            if content and reasoning_content:
+                            # Only require content to be non-empty (reasoning_content already filtered when saving)
+                            if content:
                                 reasoning_map[content] = reasoning_content
-                    except json.JSONDecodeError:
+                    except json.JSONDecodeError as e:
+                        malformed_lines += 1
+                        if malformed_lines == 1:  # Only log first error to avoid spam
+                            print(f"Warning: Malformed JSON on line {line_num} in reasoning file: {e}")
                         continue
+
+            if malformed_lines > 0:
+                print(f"Warning: Skipped {malformed_lines} malformed lines in reasoning file")
             print(f"Loaded {len(reasoning_map)} reasoning entries from {reasoning_file}")
         except Exception as e:
             print(f"Warning: Failed to load reasoning file: {e}")

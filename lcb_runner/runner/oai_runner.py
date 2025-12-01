@@ -132,27 +132,36 @@ class OpenAIRunner(BaseRunner):
         if not has_reasoning:
             return
 
-        output_dir = Path(self.args.output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        reasoning_file = output_dir / "reasoning_result.jsonl"
+        try:
+            output_dir = Path(self.args.output_dir)
+            # Only create directory if it doesn't exist (avoid repeated checks)
+            if not output_dir.exists():
+                output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Prepare reasoning data
-        reasoning_data = {
-            "prompt": prompt,
-            "model": self.client_kwargs.get("model", "unknown"),
-            "responses": []
-        }
+            reasoning_file = output_dir / "reasoning_result.jsonl"
 
-        for c in response.choices:
-            content = c.message.content or ""
-            reasoning_content = getattr(c.message, 'reasoning_content', None) or ""
+            # Prepare reasoning data (only save responses with reasoning content)
+            reasoning_data = {
+                "prompt": prompt,
+                "model": self.client_kwargs.get("model", "unknown"),
+                "responses": []
+            }
 
-            reasoning_data["responses"].append({
-                "content": content,
-                "reasoning_content": reasoning_content,
-                "index": c.index
-            })
+            for c in response.choices:
+                content = c.message.content or ""
+                reasoning_content = getattr(c.message, 'reasoning_content', None) or ""
 
-        with open(reasoning_file, 'a') as f:
-            json.dump(reasoning_data, f)
-            f.write('\n')
+                # Only append if there's reasoning content (since we already checked has_reasoning)
+                if reasoning_content:
+                    reasoning_data["responses"].append({
+                        "content": content,
+                        "reasoning_content": reasoning_content,
+                    })
+
+            line = json.dumps(reasoning_data) + '\n'
+            with open(reasoning_file, 'a') as f:
+                f.write(line)
+
+        except Exception as e:
+            # Don't fail the entire run just because we couldn't save reasoning
+            print(f"Warning: Failed to save reasoning content: {e}", flush=True)
