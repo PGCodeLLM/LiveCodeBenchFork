@@ -1,5 +1,7 @@
 import json
+import fcntl
 from time import sleep
+from pathlib import Path
 
 import openai
 from openai import OpenAI
@@ -114,5 +116,56 @@ class OpenAIRunner(BaseRunner):
                 print(f"[Reasoning content detected.] \n Prompt:{prompt} \n Reasoning Content: {message.reasoning_content} \n [End of reasoning content]", flush=True)
             else:
                 print(f"[No reasoning content detected.] \n Prompt:{prompt}", flush=True)
-                
+
+        self._save_reasoning_content(prompt, response)
+
         return [c.message.content or "" for c in response.choices]
+
+    def _save_reasoning_content(self, prompt: list[dict[str, str]], response):
+        """Save reasoning content to a separate JSON file for post-processing."""
+        # Check if any response has reasoning_content
+        has_reasoning = any(
+            hasattr(c.message, 'reasoning_content') and c.message.reasoning_content
+            for c in response.choices
+        )
+
+        # Only save if there's actual reasoning content
+        if not has_reasoning:
+            return
+
+        try:
+            output_dir = Path(self.args.output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
+            reasoning_file = output_dir / "reasoning_result.jsonl"
+
+            # Prepare reasoning data (only save responses with reasoning content)
+            reasoning_data = {
+                "prompt": prompt,
+                "model": self.client_kwargs.get("model", "unknown"),
+                "responses": []
+            }
+
+            for c in response.choices:
+                content = c.message.content or ""
+                reasoning_content = getattr(c.message, 'reasoning_content', None) or ""
+
+                # Only append if there's reasoning content (since we already checked has_reasoning)
+                if reasoning_content:
+                    reasoning_data["responses"].append({
+                        "content": content,
+                        "reasoning_content": reasoning_content,
+                    })
+
+            line = json.dumps(reasoning_data) + '\n'
+
+            with open(reasoning_file, 'a') as f:
+                fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+                try:
+                    f.write(line)
+                    f.flush()
+                finally:
+                    fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+        except Exception as e:
+            # Don't fail the entire run just because we couldn't save reasoning
+            print(f"Warning: Failed to save reasoning content: {e}", flush=True)
