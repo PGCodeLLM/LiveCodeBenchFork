@@ -7,6 +7,7 @@ import openai
 from openai import OpenAI
 from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from openai.types.chat.chat_completion import Choice
+from openai.lib.streaming.chat import ChatCompletionStreamState
 
 from lcb_runner.lm_styles import LMStyle
 from lcb_runner.runner.base_runner import BaseRunner
@@ -50,17 +51,17 @@ class OpenAIRunner(BaseRunner):
             self.client_kwargs = {
                 "model": args.model,
                 "temperature": args.temperature,
+                #"max_tokens": args.max_tokens,
                 "top_p": args.top_p,
                 "n": args.n,
                 "timeout": args.openai_timeout,
                 # "stop": args.stop, --> stop is only used for base models currently
             }
 
-            if args.max_tokens is not None:
-                self.client_kwargs["max_tokens"] = args.max_tokens
-
             if args.presence_penalty is not None:
                 self.client_kwargs["presence_penalty"] = args.presence_penalty
+            if args.max_tokens is not None:
+                self.client_kwargs["max_tokens"] = args.max_tokens
 
             # Only add extra_body/extra_headers if they have content
             if extra_body:
@@ -85,52 +86,11 @@ class OpenAIRunner(BaseRunner):
                 )
             else:
                 # Handle streaming
-                stream_response = OpenAIRunner.client.chat.completions.create(
+                with OpenAIRunner.client.chat.completions.stream(
                     messages=prompt,
-                    stream=True,
                     **self.client_kwargs,
-                )
-
-                num_samples = self.client_kwargs.get("n", 1)
-                accumulated_content = [""] * num_samples
-                finish_reasons = [None] * num_samples
-                roles = [None] * num_samples
-
-                for chunk in stream_response:
-                    if not chunk.choices:
-                        continue
-                    for choice in chunk.choices:
-                        idx = choice.index
-                        if choice.delta:
-                            if choice.delta.content:
-                                accumulated_content[idx] += choice.delta.content
-                            if choice.delta.role:
-                                roles[idx] = choice.delta.role
-                        if choice.finish_reason:
-                            finish_reasons[idx] = choice.finish_reason
-
-                choices = []
-                for i in range(num_samples):
-                    role = roles[i] if roles[i] else "assistant"
-                    finish_reason = finish_reasons[i] if finish_reasons[i] else "stop"
-                    choices.append(
-                        Choice(
-                            index=i,
-                            finish_reason=finish_reason,
-                            message=ChatCompletionMessage(
-                                role=role,
-                                content=accumulated_content[i],
-                            ),
-                        )
-                    )
-
-                response = ChatCompletion(
-                    id="streamed-" + str(int(time.time())),
-                    object="chat.completion",
-                    created=int(time.time()),
-                    model=self.client_kwargs.get("model", "unknown"),
-                    choices=choices,
-                )
+                ) as stream:
+                    response = stream.get_final_completion() # This will wait for the full response to be received
 
         except (
             openai.APIError,
@@ -151,4 +111,13 @@ class OpenAIRunner(BaseRunner):
             print(f"Failed to run the model for {prompt}!")
             print("Exception: ", repr(e))
             raise e
+        
+        #Hack: Print reasoning content if available
+        for choice in response.choices:
+            message = choice.message
+            if hasattr(message, 'reasoning_content'):
+                print(f"[Reasoning content detected.] \n Prompt:{prompt} \n Reasoning Content: {message.reasoning_content} \n [End of reasoning content]", flush=True)
+            else:
+                print(f"[No reasoning content detected.] \n Prompt:{prompt}", flush=True)
+                
         return [c.message.content or "" for c in response.choices]
