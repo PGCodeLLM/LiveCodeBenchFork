@@ -255,7 +255,27 @@ def generate_detailed_results(eval_results, output_path):
 
     output_dir = Path(output_path).parent.name
     exp_id = output_dir.split('--', 1)[1] if '--' in output_dir else output_dir
-    
+
+    # Load reasoning content if available
+    reasoning_map = {}
+    reasoning_file = Path(output_path).parent / "reasoning_result.jsonl"
+    if reasoning_file.exists():
+        try:
+            with open(reasoning_file, 'r') as f:
+                for line in f:
+                    try:
+                        data = json.loads(line.strip())
+                        for response in data.get('responses', []):
+                            content = response.get('content', '')
+                            reasoning_content = response.get('reasoning_content', '')
+                            if content and reasoning_content:
+                                reasoning_map[content] = reasoning_content
+                    except json.JSONDecodeError:
+                        continue
+            print(f"Loaded {len(reasoning_map)} reasoning entries from {reasoning_file}")
+        except Exception as e:
+            print(f"Warning: Failed to load reasoning file: {e}")
+
     detailed_results = []
 
     for entry in eval_results:
@@ -271,11 +291,15 @@ def generate_detailed_results(eval_results, output_path):
             metadata = metadata_list[kth_sample] if kth_sample < len(metadata_list) else {}
             passed = graded_list[kth_sample] if kth_sample < len(graded_list) else False
 
+            # Look up reasoning content
+            reasoning_content = reasoning_map.get(output, "")
+
             detailed_results.append({
                 'exp_id': exp_id,
                 'task_id': str(task_id),
                 'kth_sample': kth_sample,
                 'output': output,
+                'reasoning_content': reasoning_content,
                 'question_title': entry.get('question_title', ''),
                 'difficulty': entry.get('difficulty', ''),
                 'platform': entry.get('platform', ''),
