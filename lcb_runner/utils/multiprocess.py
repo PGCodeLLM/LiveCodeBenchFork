@@ -6,7 +6,7 @@ import queue
 import traceback
 from enum import Enum
 from typing import Callable, Optional, Dict, Any, List, Iterator
-from concurrent.futures import TimeoutError
+from concurrent.futures import TimeoutError, as_completed
 
 import attrs
 from pebble import concurrent, ProcessPool, ProcessExpired
@@ -146,9 +146,6 @@ def run_tasks_in_parallel_iter(
             pbar = None
 
         succ = timeouts = exceptions = expirations = 0
-
-        # Process results as they complete
-        from concurrent.futures import as_completed
         
         # Create a mapping from future to original index
         future_to_index = {future: idx for idx, future in enumerate(futures)}
@@ -156,6 +153,7 @@ def run_tasks_in_parallel_iter(
         # Store results with their original indices
         results_with_indices = []
         
+        # Process results as they complete
         for future in as_completed(futures):
             original_index = future_to_index[future]
             

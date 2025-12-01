@@ -1,13 +1,8 @@
-import os
 import json
-import time
 from time import sleep
 
 import openai
 from openai import OpenAI
-from openai.types.chat import ChatCompletion, ChatCompletionMessage
-from openai.types.chat.chat_completion import Choice
-from openai.lib.streaming.chat import ChatCompletionStreamState
 
 from lcb_runner.lm_styles import LMStyle
 from lcb_runner.runner.base_runner import BaseRunner
