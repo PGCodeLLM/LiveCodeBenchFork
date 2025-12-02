@@ -92,7 +92,7 @@ class BaseRunner(ABC):
                     print("Failed to run the model for some prompts")
                     print(output.status)
                     print(output.exception_tb)
-                    outputs.extend([""] * self.args.n)
+                    outputs.append([""] * self.args.n)
         else:
             outputs = [self.run_single(argument) for argument in
                        tqdm(arguments, progress_file=progress_file_path)]
