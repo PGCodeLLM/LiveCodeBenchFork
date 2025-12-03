@@ -72,7 +72,7 @@ def main():
 
     # If model outputs are empty (probably due to failed inference requests),
     # add args.n empty strings to ensure failed tasks are still evaluated
-    # results = [r if r else [""] * args.n for r in results]
+    results = [r if r else [""] * args.n for r in results]
     combined_results = combine_results(
         args.scenario, results, model, args.cot_code_execution
     )
