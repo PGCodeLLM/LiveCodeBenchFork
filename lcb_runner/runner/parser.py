@@ -165,6 +165,14 @@ def get_args():
         help="The directory storing the outputs",
     )
 
+    parser.add_argument(
+        "--extraction_strategy",
+        type=str,
+        default="last-block",
+        choices=["last-block", "last-block-python-first"],
+        help="The code extraction strategy to use. `last-block` extracts the last code block found in the model output. `last-block-python-first` first tries to extract the last python code block, if none found, extracts the last code block.",
+    )
+
     args = parser.parse_args()
 
     args.stop = args.stop.split(",")

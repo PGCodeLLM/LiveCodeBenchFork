@@ -85,12 +85,13 @@ def combine_results(
     results: list[list[str]],
     model: LanguageModel,
     cot_code_execution: bool = False,
+    extraction_strategy: str = "last-block",
 ):
     if scenario == Scenario.codegeneration:
         combined_results = [
             (
                 outputs_list,
-                [extract_code(output, model.model_style) for output in outputs_list],
+                [extract_code(output, model.model_style, extraction_strategy) for output in outputs_list],
             )
             for outputs_list in results
         ]
@@ -114,9 +115,9 @@ def combine_results(
                 ],
                 [
                     (
-                        extract_code(output[0], model.model_style)
+                        extract_code(output[0], model.model_style, extraction_strategy)
                         if type(output) is list
-                        else extract_code(output, model.model_style)
+                        else extract_code(output, model.model_style, extraction_strategy)
                     )
                     for output in outputs_list
                 ],
