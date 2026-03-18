@@ -18,6 +18,9 @@ from tqdm import tqdm
 
 from lcb_runner.evaluation.testing_util import run_test
 from lcb_runner.evaluation.pass_k_utils import compute_metrics_from_results
+from lcb_runner.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
 def _temp_run(sample, generation, debug, result, metadata_list, timeout):
@@ -49,7 +52,7 @@ def check_correctness(sample, generation, timeout, debug=True):
         # consider that all tests failed
         result = [[-1 for i in range(len(in_outs["inputs"]))]]
         if debug:
-            print(f"global timeout")
+            logger.warning("Global timeout for task")
     return result[0], metadata_list[0]
 
 
@@ -74,7 +77,7 @@ def evaluate_generations_by_problem(args):
                 sample, o, timeout=timeout, debug=debug
             )
             if debug:
-                print(f"\nSuccessful compilation of task {o_idx}!")
+                logger.debug("Successful compilation of task %d", o_idx)
             fixed = []
             for e in curr_res:
                 if isinstance(e, np.ndarray):
@@ -85,10 +88,10 @@ def evaluate_generations_by_problem(args):
             curr_res = fixed
             if not np.all(curr_res):
                 if debug:
-                    print(f"Results were not True for all test cases {curr_res=}\n")
+                    logger.debug("Results were not True for all test cases: %s", curr_res)
         except Exception as e:
             if debug:
-                print(f"Compilation failed, test framework exception = {repr(e)}{e}\n")
+                logger.debug("Compilation failed, test framework exception = %r", e)
             # break
             curr_metadata = {
                 "error": repr(e),
@@ -102,12 +105,7 @@ def evaluate_generations_by_problem(args):
             metadata.append(curr_metadata)
     if debug:
         for i, r in enumerate(problem_generations):
-            print("Sample\n")
-            print(r)
-            print("\n")
-            print("Result\n")
-            print(res[i])
-            print("*" * 30 + "\n\n")
+            logger.debug("Sample:\n%s\nResult:\n%s\n%s", r, res[i], "*" * 30)
     return res, metadata
 
 
@@ -184,7 +182,7 @@ def codegen_metrics(
             generations_linear.append([generation])
             remap_index.append(idx)
 
-    print(f"Evaluating {len(samples_linear)}...")
+    logger.info("Evaluating %d samples...", len(samples_linear))
 
     results_linear, metadatas_linear = evaluate_generations(
         samples_linear,

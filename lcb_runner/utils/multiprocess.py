@@ -196,8 +196,11 @@ def run_tasks_in_parallel_iter(
                 pbar.set_postfix(
                     succ=succ, timeouts=timeouts, exc=exceptions, p_exp=expirations
                 )
-                sys.stdout.flush()
-                sys.stderr.flush()
+                try:
+                    sys.stdout.flush()
+                    sys.stderr.flush()
+                except BlockingIOError:
+                    pass
         
         # Sort by original index and yield in submission order
         results_with_indices.sort(key=lambda x: x[0])

@@ -49,7 +49,9 @@ class TimeoutException(Exception):
 
 
 def timeout_handler(signum, frame):
-    print("timeout occured: alarm went off")
+    # NOTE: Do NOT print/log here — this is a signal handler.
+    # Calling print() in a signal handler can trigger BlockingIOError
+    # under heavy I/O, and logging is not async-signal-safe either.
     raise TimeoutException
 
 
@@ -485,7 +487,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
     reliability_guard()
 
     if debug:
-        print(f"start = {datetime.now().time()}")
+        pass  # timing logs removed to avoid BlockingIOError under heavy I/O
 
     try:
         in_outs = json.loads(sample["input_output"])
@@ -503,7 +505,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
             method_name = in_outs["fn_name"]
 
     if debug:
-        print(f"loaded input_output = {datetime.now().time()}")
+        pass  # timing logs removed to avoid BlockingIOError under heavy I/O
 
     if test is None:
         assert False, "should not happen: test code is none"
@@ -517,7 +519,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
         results = []
         sol = import_string
         if debug:
-            print(f"loading test code = {datetime.now().time()}")
+            pass  # timing logs removed to avoid BlockingIOError under heavy I/O
 
         if which_type == CODE_TYPE.call_based:
             signal.alarm(timeout)

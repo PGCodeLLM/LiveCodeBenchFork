@@ -8,6 +8,9 @@ from openai import OpenAI
 
 from lcb_runner.lm_styles import LMStyle
 from lcb_runner.runner.base_runner import BaseRunner
+from lcb_runner.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
 class OpenAIRunner(BaseRunner):
@@ -23,7 +26,7 @@ class OpenAIRunner(BaseRunner):
         # Store stream setting
         self.stream = getattr(args, 'stream', False)
         if self.stream:
-            print("[LCB] Streaming is enabled.")
+            logger.info("Streaming is enabled.")
 
         if model.model_style == LMStyle.OpenAIReasonPreview:
             self.client_kwargs = {
@@ -66,13 +69,13 @@ class OpenAIRunner(BaseRunner):
             if extra_headers:
                 self.client_kwargs["extra_headers"] = extra_headers
 
-        print(f"[LCB Inference Parameters] {self.client_kwargs}")
+        logger.info("Inference parameters: %s", self.client_kwargs)
 
     def _run_single(self, prompt: list[dict[str, str]], n: int = 10) -> list[str]:
         assert isinstance(prompt, list)
 
         if n == 0:
-            print("Max retries reached. Returning empty response.")
+            logger.warning("Max retries reached. Returning empty response.")
             return []
 
         try:
@@ -99,23 +102,20 @@ class OpenAIRunner(BaseRunner):
             openai.InternalServerError,
             openai.APIConnectionError,
         ) as e:
-            print("Exception: ", repr(e))
-            print("Sleeping for 30 seconds...")
-            print("Consider reducing the number of parallel processes.")
+            logger.warning("API error (retries left=%d): %r. Sleeping 30s...", n - 1, e)
             sleep(30)
             return self._run_single(prompt, n=n - 1)
         except Exception as e:
-            print(f"Failed to run the model for {prompt}!")
-            print("Exception: ", repr(e))
+            logger.error("Failed to run the model: %r", e)
             raise e
         
-        # Hack: Print reasoning content if available
+        # Log reasoning content if available
         for choice in response.choices:
             message = choice.message
-            if hasattr(message, 'reasoning_content'):
-                print(f"[Reasoning content detected.] \n Prompt:{prompt} \n Reasoning Content: {message.reasoning_content} \n [End of reasoning content]", flush=True)
+            if hasattr(message, 'reasoning_content') and message.reasoning_content:
+                logger.debug("Reasoning content detected (len=%d)", len(str(message.reasoning_content)))
             else:
-                print(f"[No reasoning content detected.] \n Prompt:{prompt}", flush=True)
+                logger.debug("No reasoning content detected")
 
         self._save_reasoning_content(prompt, response)
 
@@ -168,4 +168,4 @@ class OpenAIRunner(BaseRunner):
 
         except Exception as e:
             # Don't fail the entire run just because we couldn't save reasoning
-            print(f"Warning: Failed to save reasoning content: {e}", flush=True)
+            logger.warning("Failed to save reasoning content: %s", e)
