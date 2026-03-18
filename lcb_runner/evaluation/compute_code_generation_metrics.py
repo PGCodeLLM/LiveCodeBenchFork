@@ -18,7 +18,7 @@ from tqdm import tqdm
 
 from lcb_runner.evaluation.testing_util import run_test
 from lcb_runner.evaluation.pass_k_utils import compute_metrics_from_results
-from lcb_runner.utils.logger import setup_logger
+from lcb_runner.utils.logger import setup_logger, truncate
 
 logger = setup_logger(__name__)
 
@@ -105,7 +105,7 @@ def evaluate_generations_by_problem(args):
             metadata.append(curr_metadata)
     if debug:
         for i, r in enumerate(problem_generations):
-            logger.debug("Sample:\n%s\nResult:\n%s\n%s", r, res[i], "*" * 30)
+            logger.debug("Sample:\n%s\nResult:\n%s", truncate(r), truncate(res[i]))
     return res, metadata
 
 

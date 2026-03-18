@@ -7,7 +7,7 @@ from lcb_runner.utils.path_utils import get_cache_path, get_progress_path
 from lcb_runner.utils.progress import TeeTqdm as tqdm
 from lcb_runner.utils.multiprocess import run_tasks_in_parallel
 from lcb_runner.runner.scenario_router import Scenario
-from lcb_runner.utils.logger import setup_logger
+from lcb_runner.utils.logger import setup_logger, truncate
 
 logger = setup_logger(__name__)
 
@@ -59,13 +59,13 @@ class BaseRunner(ABC):
 
         if cache is not None and prompt_cache in cache:
             if len(cache[prompt_cache]) == args.n:
-                logger.debug("Cache hit for prompt (len=%d)", len(prompt_cache))
+                logger.info("(Cache Hit) Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(cache[prompt_cache])))
                 return cache[prompt_cache]
 
         result = call_method(prompt)
         assert len(result) == args.n
 
-        logger.debug("Completed prompt (len=%d), result count=%d", len(prompt_cache), len(result))
+        logger.info("Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(result)))
         return result
 
     def run_batch(self, prompts: list[str | list[dict[str, str]]]) -> list[list[str]]:
@@ -92,7 +92,7 @@ class BaseRunner(ABC):
                 if output.is_success():
                     outputs.append(output.result)
                 else:
-                    logger.error("Failed to run the model for some prompts: %s\n%s", output.status, output.exception_tb)
+                    logger.error("Failed to run the model for some prompts: %s\n%s", output.status, truncate(output.exception_tb))
                     outputs.append([""] * self.args.n)
         else:
             outputs = [self.run_single(argument) for argument in

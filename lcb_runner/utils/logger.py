@@ -7,6 +7,18 @@ when stdout buffer is full under heavy I/O with many parallel processes.
 import logging
 import sys
 
+# Default max length for truncated log messages
+_MAX_LOG_STR_LEN = 500
+
+
+def truncate(s, max_len: int = _MAX_LOG_STR_LEN) -> str:
+    """Truncate a string to max_len, showing head and tail with '...' in between."""
+    text = str(s)
+    if len(text) <= max_len:
+        return text
+    half = max_len // 2
+    return text[:half] + f"...<truncated {len(text) - max_len} chars>..." + text[-half:]
+
 
 def setup_logger(name: str = "lcb_runner", level: int = logging.INFO) -> logging.Logger:
     """Get or create a logger with a non-blocking stderr handler.

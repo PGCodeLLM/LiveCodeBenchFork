@@ -8,7 +8,7 @@ from openai import OpenAI
 
 from lcb_runner.lm_styles import LMStyle
 from lcb_runner.runner.base_runner import BaseRunner
-from lcb_runner.utils.logger import setup_logger
+from lcb_runner.utils.logger import setup_logger, truncate
 
 logger = setup_logger(__name__)
 
@@ -102,11 +102,11 @@ class OpenAIRunner(BaseRunner):
             openai.InternalServerError,
             openai.APIConnectionError,
         ) as e:
-            logger.warning("API error (retries left=%d): %r. Sleeping 30s...", n - 1, e)
+            logger.warning("API error (retries left=%d): %s. Sleeping 30s...", n - 1, truncate(repr(e)))
             sleep(30)
             return self._run_single(prompt, n=n - 1)
         except Exception as e:
-            logger.error("Failed to run the model: %r", e)
+            logger.error("Failed to run the model: %s", truncate(repr(e)))
             raise e
         
         # Log reasoning content if available
