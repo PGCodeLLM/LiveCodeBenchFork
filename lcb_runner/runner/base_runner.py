@@ -59,13 +59,13 @@ class BaseRunner(ABC):
 
         if cache is not None and prompt_cache in cache:
             if len(cache[prompt_cache]) == args.n:
-                logger.info("(Cache Hit) Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(cache[prompt_cache])))
+                logger.debug("(Cache Hit) Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(cache[prompt_cache])))
                 return cache[prompt_cache]
 
         result = call_method(prompt)
         assert len(result) == args.n
 
-        logger.info("Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(result)))
+        logger.debug("Prompt: %s\nResult: %s", truncate(prompt_cache), truncate(str(result)))
         return result
 
     def run_batch(self, prompts: list[str | list[dict[str, str]]]) -> list[list[str]]:

@@ -5,10 +5,14 @@ when stdout buffer is full under heavy I/O with many parallel processes.
 """
 
 import logging
+import os
 import sys
 
 # Default max length for truncated log messages
 _MAX_LOG_STR_LEN = 500
+
+# Read log level from env: LCB_LOG_LEVEL=DEBUG|INFO|WARNING|ERROR (default: INFO)
+_LOG_LEVEL = getattr(logging, os.environ.get("LCB_LOG_LEVEL", "INFO").upper(), logging.INFO)
 
 
 def truncate(s, max_len: int = _MAX_LOG_STR_LEN) -> str:
@@ -20,7 +24,7 @@ def truncate(s, max_len: int = _MAX_LOG_STR_LEN) -> str:
     return text[:half] + f"...<truncated {len(text) - max_len} chars>..." + text[-half:]
 
 
-def setup_logger(name: str = "lcb_runner", level: int = logging.INFO) -> logging.Logger:
+def setup_logger(name: str = "lcb_runner", level: int = _LOG_LEVEL) -> logging.Logger:
     """Get or create a logger with a non-blocking stderr handler.
 
     Uses stderr instead of stdout because:
