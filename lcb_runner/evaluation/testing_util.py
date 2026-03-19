@@ -523,7 +523,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
         results = []
         sol = import_string
         if debug:
-            pass  # timing logs removed to avoid BlockingIOError under heavy I/O
+            logger.debug("loading test code: %s", datetime.now().time())
 
         if which_type == CODE_TYPE.call_based:
             signal.alarm(timeout)
