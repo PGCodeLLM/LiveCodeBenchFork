@@ -13,6 +13,9 @@ from lcb_runner.runner.scenario_router import (
     sort_and_extract_save_results,
     get_metrics,
 )
+from lcb_runner.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
 def main():
@@ -25,7 +28,7 @@ def main():
     benchmark, format_prompt = build_prompt_benchmark(args)
     if args.debug:
         benchmark = benchmark[:15]
-        print(f"Running with {len(benchmark)} instances in debug mode")
+        logger.info("Running with %d instances in debug mode", len(benchmark))
 
     output_path = get_output_path(model.model_repr, args)
     eval_file = output_path.replace(".json", "_eval.json")
@@ -39,9 +42,7 @@ def main():
             with open(eval_all_file, "r") as f:
                 old_save_results = json.load(f)
         else:
-            print(
-                f"File {output_path} does not exist in --continue_existing, starting from scratch"
-            )
+            logger.warning("File %s does not exist in --continue_existing, starting from scratch", output_path)
             old_save_results = []
 
         old_save_results = [
@@ -57,9 +58,7 @@ def main():
             for instance in benchmark
             if instance.question_id not in old_save_results_question_ids
         ]
-        print(
-            f"Found {len(old_save_results)} existing generations, continuing with {len(remaining_benchmark)} remaining"
-        )
+        logger.info("Found %d existing generations, continuing with %d remaining", len(old_save_results), len(remaining_benchmark))
     else:
         old_save_results = []
         remaining_benchmark = benchmark
@@ -136,7 +135,7 @@ def main():
             if new_eval_size == 0:
                 return
 
-            print(f"Found {old_eval_size}, running evals for {new_eval_size} problems")
+            logger.info("Found %d, running evals for %d problems", old_eval_size, new_eval_size)
 
             metrics = get_metrics(args.scenario, args, benchmark, combined_results)
             graded = extract_instance_results(metrics[1])
@@ -159,7 +158,7 @@ def main():
                         }
                 metrics[1] = {**metrics[1], **old_eval_results[1]}
             else:
-                print("Old eval file not present, cannot update eval file")
+                logger.warning("Old eval file not present, cannot update eval file")
                 metrics = {}
 
         else:
@@ -235,7 +234,7 @@ def main():
         detailed_results = generate_detailed_results(save_eval_results, output_path)
         with open(detailed_results_file, "w") as f:
             json.dump(detailed_results, f, indent=2)
-        print(f"Generated detailed results file: {detailed_results_file}")
+        logger.info("Generated detailed results file: %s", detailed_results_file)
 
 
 def generate_detailed_results(eval_results, output_path):
@@ -278,14 +277,14 @@ def generate_detailed_results(eval_results, output_path):
                     except json.JSONDecodeError as e:
                         malformed_lines += 1
                         if malformed_lines == 1:  # Only log first error to avoid spam
-                            print(f"Warning: Malformed JSON on line {line_num} in reasoning file: {e}")
+                            logger.warning("Malformed JSON on line %d in reasoning file: %s", line_num, e)
                         continue
 
             if malformed_lines > 0:
-                print(f"Warning: Skipped {malformed_lines} malformed lines in reasoning file")
-            print(f"Loaded {len(reasoning_map)} reasoning entries from {reasoning_file}")
+                logger.warning("Skipped %d malformed lines in reasoning file", malformed_lines)
+            logger.info("Loaded %d reasoning entries from %s", len(reasoning_map), reasoning_file)
         except Exception as e:
-            print(f"Warning: Failed to load reasoning file: {e}")
+            logger.warning("Failed to load reasoning file: %s", e)
 
     detailed_results = []
 

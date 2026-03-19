@@ -24,6 +24,10 @@ from enum import Enum
 from decimal import Decimal
 import time
 
+from lcb_runner.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
 import_string = "from string import *\nfrom re import *\nfrom datetime import *\nfrom collections import *\nfrom heapq import *\nfrom bisect import *\nfrom copy import *\nfrom math import *\nfrom random import *\nfrom statistics import *\nfrom itertools import *\nfrom functools import *\nfrom operator import *\nfrom io import *\nfrom sys import *\nfrom json import *\nfrom builtins import *\nfrom typing import *\nimport string\nimport re\nimport datetime\nimport collections\nimport heapq\nimport bisect\nimport copy\nimport math\nimport random\nimport statistics\nimport itertools\nimport functools\nimport operator\nimport io\nimport sys\nimport json\nsys.setrecursionlimit(50000)\n"
 
 
@@ -49,7 +53,9 @@ class TimeoutException(Exception):
 
 
 def timeout_handler(signum, frame):
-    print("timeout occured: alarm went off")
+    # NOTE: Do NOT print/log here — this is a signal handler.
+    # Calling print() in a signal handler can trigger BlockingIOError
+    # under heavy I/O, and logging is not async-signal-safe either.
     raise TimeoutException
 
 
@@ -485,7 +491,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
     reliability_guard()
 
     if debug:
-        print(f"start = {datetime.now().time()}")
+        logger.debug("timing: %s", datetime.now().time())
 
     try:
         in_outs = json.loads(sample["input_output"])
@@ -503,7 +509,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
             method_name = in_outs["fn_name"]
 
     if debug:
-        print(f"loaded input_output = {datetime.now().time()}")
+        logger.debug("timing: %s", datetime.now().time())
 
     if test is None:
         assert False, "should not happen: test code is none"
@@ -517,7 +523,7 @@ def run_test(sample, test=None, debug=False, timeout=6):
         results = []
         sol = import_string
         if debug:
-            print(f"loading test code = {datetime.now().time()}")
+            logger.debug("loading test code: %s", datetime.now().time())
 
         if which_type == CODE_TYPE.call_based:
             signal.alarm(timeout)

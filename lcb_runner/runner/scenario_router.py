@@ -2,6 +2,9 @@ from typing import Union
 
 from lcb_runner.utils.scenarios import Scenario
 from lcb_runner.lm_styles import LanguageModel
+from lcb_runner.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 from lcb_runner.evaluation import (
     codegen_metrics,
     test_output_metrics,
@@ -212,6 +215,6 @@ def get_metrics(
     else:
         raise ValueError(f"Scenario {scenario} not implemented")
 
-    print(metrics[0]["pass@1"])
+    logger.info("pass@1: %s", metrics[0]["pass@1"])
 
     return metrics
