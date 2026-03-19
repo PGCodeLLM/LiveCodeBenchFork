@@ -109,7 +109,7 @@ class OpenAIRunner(BaseRunner):
             logger.error("Failed to run the model: %s", truncate(repr(e)))
             raise e
         
-        # Log reasoning content if available
+        # Hack: Log reasoning content if available
         for choice in response.choices:
             message = choice.message
             if hasattr(message, 'reasoning_content') and message.reasoning_content:
