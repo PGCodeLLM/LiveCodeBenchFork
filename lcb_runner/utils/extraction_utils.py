@@ -1,7 +1,9 @@
+import re
+
 from lcb_runner.lm_styles import LMStyle
 
 
-def extract_code(model_output: str, lmstyle: LMStyle):
+def extract_code(model_output: str, lmstyle: LMStyle, extraction_strategy: str = "last-block"):
     outputlines = model_output.split("\n")
     if lmstyle == LMStyle.CodeLLaMaInstruct:
         indexlines = [i for i, line in enumerate(outputlines) if "PYTHON]" in line]
@@ -10,11 +12,14 @@ def extract_code(model_output: str, lmstyle: LMStyle):
     elif lmstyle == LMStyle.GenericBase:
         return model_output.strip()
     else:
-        indexlines = [i for i, line in enumerate(outputlines) if "```" in line]
-        if len(indexlines) < 2:
-            return ""
-        # return "\n".join(outputlines[indexlines[0] + 1 : indexlines[1]])
-        return "\n".join(outputlines[indexlines[-2] + 1 : indexlines[-1]])
+        if extraction_strategy == "last-block-python-first":
+            code_blocks = re.findall(r'```python?\n(.*?)```', model_output, re.DOTALL)
+            if code_blocks:
+                return code_blocks[-1].strip()
+        code_blocks = re.findall(r'```\n(.*?)```', model_output, re.DOTALL)
+        if code_blocks:
+            return code_blocks[-1].strip()
+        return ""
 
 
 def extract_test_output_code(model_output: str, lmstyle: LMStyle = None):
