@@ -113,9 +113,9 @@ class OpenAIRunner(BaseRunner):
         for choice in response.choices:
             message = choice.message
             if hasattr(message, 'reasoning_content') and message.reasoning_content:
-                logger.debug("Reasoning content detected (len=%d)", len(str(message.reasoning_content)))
+                logger.info("Reasoning content detected (len=%d)", len(str(message.reasoning_content)))
             else:
-                logger.debug("No reasoning content detected")
+                logger.info("No reasoning content detected")
 
         self._save_reasoning_content(prompt, response)
 

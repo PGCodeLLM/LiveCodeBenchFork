@@ -4,9 +4,17 @@ Replaces print() calls with proper logging to avoid BlockingIOError (errno 11)
 when stdout buffer is full under heavy I/O with many parallel processes.
 """
 
+import io
 import logging
 import os
 import sys
+
+# Force line-buffered stderr so tqdm progress and log messages flush immediately,
+# even in non-TTY environments (e.g. Docker, piped output).
+if hasattr(sys.stderr, "buffer"):
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, line_buffering=True)
+if hasattr(sys.stdout, "buffer"):
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, line_buffering=True)
 
 # Default max length for truncated log messages
 _MAX_LOG_STR_LEN = 500
